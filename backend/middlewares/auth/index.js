@@ -112,6 +112,5 @@ export const isOwnerOrAdmin = async (req, res, next) => {
 // Middleware: Role Authorization
 //====================================================================
 
-export const generalManager = checkRole("generalManager");
-export const shelfManager = checkRole("bookshelfManager");
+export const admin = checkRole("admin");
 export const financeManager = checkRole("financeManager");

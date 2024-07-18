@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 
 const { Schema } = mongoose;
 
-
 const userSchema = new Schema(
   {
     username: { type: String, required: true, unique: true },
@@ -38,7 +37,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       default: "user",
-      enum: ["user", "bookshelfManager", "financeManager", "generalManager"],
+      enum: ["user", "financeManager", "admin"],
     },
 
     agree: { type: Boolean, required: true },
@@ -47,7 +46,6 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
-
 
 userSchema.pre("save", async function (next) {
   try {
@@ -60,8 +58,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-
 const User = mongoose.model("User", userSchema);
-
 
 export default User;
