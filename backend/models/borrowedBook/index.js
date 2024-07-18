@@ -10,15 +10,16 @@ const borrowedBookSchema = new Schema(
     dateBorrowed: { type: Date, default: Date.now },
     dueDate: { type: Date, required: true },
     returnDate: { type: Date },
-    status: {
-      type: String,
-      enum: ["borrowed", "returned", "overdue"],
-      default: "borrowed",
+
+    book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
+
+    borrowedFrom: {
+      type: mongoose.Types.ObjectId,
+      ref: "Bookshelf",
+      required: true,
     },
 
-    // Average rating of a book
     ratings: { type: Number },
-    // Individual user review for rating a book
     reviews: [
       {
         user: { type: Object },
@@ -28,14 +29,23 @@ const borrowedBookSchema = new Schema(
         createdAt: { type: Date, default: Date.now() },
       },
     ],
+
+    status: {
+      type: String,
+      enum: ["borrowed", "returned", "overdue"],
+      default: "borrowed",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Create the model for BorrowedBook
-
 const BorrowedBook = mongoose.model("BorrowedBook", borrowedBookSchema);
 
 export default BorrowedBook;
+
+
+
+
+

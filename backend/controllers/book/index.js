@@ -1,11 +1,40 @@
 import Book from "../../models/book/index.js";
 import createError from "http-errors";
+import Bookshelf from "../../models/bookshelf/index.js";
 
 //==========================================================================
 // Create New book
 //==========================================================================
 export const createBook = async (req, res, next) => {
-  const { ISBN } = req.body;
+  const {
+    ISBN,
+    title,
+    authors,
+    publishedDate,
+    genres,
+    summary,
+    pages,
+    language,
+    publisher,
+    coverImageUrl,
+    shelfId,
+  } = req.body;
+
+  if (
+    !ISBN ||
+    !title ||
+    !authors ||
+    !publishedDate ||
+    !summary ||
+    !language ||
+    !publisher ||
+    !coverImageUrl ||
+    !shelfId
+  ) {
+    return res
+      .status(400)
+      .json({ message: "All required fields must be provided" });
+  }
 
   try {
     const book = await Book.findOne({ ISBN });
@@ -14,23 +43,36 @@ export const createBook = async (req, res, next) => {
       return next(createError(400, "Book already exist!"));
     }
 
-    if (!book) {
-      const newBook = new Book(req.body);
+    const newBook = new Book({
+      ISBN,
+      title,
+      authors,
+      publishedDate,
+      genres,
+      summary,
+      pages,
+      language,
+      publisher,
+      coverImageUrl,
+    });
 
-      try {
-        await newBook.save();
-      } catch (error) {
-        console.log(error);
-        return next(createError(500, "Book not saved"));
-      }
+    const savedBook = await newBook.save();
 
-      res.status(201).json({
+    const bookshelf = await Bookshelf.findById(shelfId);
+    if (!bookshelf) {
+      return res.status(404).json({ message: "Bookshelf not found" });
+    };
+
+    bookshelf.books.push(savedBook._id);
+    await bookshelf.save();
+
+    res
+      .status(201)
+      .json({
         success: true,
-        message: "Book successfully created!",
+        message: "Book created and added to the bookshelf successfully",
       });
-    }
   } catch (error) {
-    console.log(error);
     return next(createError(500, "Server error! please try again!"));
   }
 };

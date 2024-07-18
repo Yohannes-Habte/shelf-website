@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const { Schema } = mongoose;
 
-// User Schema
+
 const userSchema = new Schema(
   {
     username: { type: String, required: true, unique: true },
@@ -21,10 +21,6 @@ const userSchema = new Schema(
     borrowedBooks: [
       {
         _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },
-      },
-
-      {
-        _id: { type: mongoose.Types.ObjectId, ref: "Book" },
       },
 
       {
@@ -52,7 +48,7 @@ const userSchema = new Schema(
   }
 );
 
-// Before saving the user password, encrypt it
+
 userSchema.pre("save", async function (next) {
   try {
     if (!this.isModified("password")) return next();
@@ -64,8 +60,8 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// User Model
+
 const User = mongoose.model("User", userSchema);
 
-// Export User Model
+
 export default User;

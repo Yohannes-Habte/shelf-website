@@ -103,11 +103,103 @@ export const loginUser = async (req, res, next) => {
         .status(200)
         .json({
           success: true,
-          user: { ...rest },
+          result: { ...rest },
           message: "User successfully logged in!",
         });
     }
   } catch (error) {
-    return next(createError(400, "You are unable to login! Please try again!"));
+    return next(createError(400, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
+// Update user account
+//==========================================================================
+export const updateUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(createError(404, "User does not exist!"));
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    try {
+      await updatedUser.save();
+    } catch (error) {
+      return next(createError(500, "Update could not be saved!"));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: updatedUser,
+      message: "Account successfully updated!",
+    });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
+// User logout
+//==========================================================================
+
+export const userLogout = async (req, res, next) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: false,
+      secure: true,
+      sameSite: "strict",
+    });
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    next(createError(500, "Server error!"));
+  }
+};
+
+//==========================================================================
+// Change password
+//==========================================================================
+export const changePassword = async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return next(createError(404, "User not found! Please login!"));
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      return next(createError(400, "Invalid old password! Please try again!"));
+    }
+
+    user.password = newPassword;
+
+    try {
+      await user.save();
+    } catch (error) {
+      return next(
+        createError(500, "New password could not be saved! Please try again!")
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: user,
+      message: "Password is successfully updated!",
+    });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
   }
 };

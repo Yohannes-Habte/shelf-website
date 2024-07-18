@@ -21,14 +21,22 @@ const bookSchema = new Schema(
       },
     ],
     summary: { type: String, required: true },
-
     pages: { type: Number },
     language: { type: String, required: true },
     publisher: { type: String, required: true },
     coverImageUrl: { type: String, required: true },
-    // Average rating of a book
+    borrowedTimes: [
+      {
+        _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },
+      },
+    ],
+    status: {
+      type: String,
+      default: "available",
+      enum: ["available", "borrowed"],
+    },
+
     ratings: { type: Number },
-    // Individual user review for rating a book
     reviews: [
       {
         user: { type: Object },
