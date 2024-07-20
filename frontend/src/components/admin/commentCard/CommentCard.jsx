@@ -1,6 +1,6 @@
-import "./UserCard.scss";
+import "./CommentCard.scss";
 
-const UserCard = () => {
+const CommentCard = () => {
   return (
     <section className="user-sidebar-container">
       <h3 className="user-sidbar-title"> User Sidebar</h3>
@@ -8,4 +8,4 @@ const UserCard = () => {
   );
 };
 
-export default UserCard
+export default CommentCard

@@ -1,9 +1,15 @@
+import Navbar from "../navbar/Navbar";
 import "./Header.scss";
 
 const Header = () => {
   return (
     <header className="header-container">
-      <h3 className="header-title"> Header </h3>
+      <h1 className="flex">
+        <span className="text-green-500 text-3xl">Book.</span>{" "}
+        <span className="text-purple-500 text-3xl">Look</span>
+      </h1>
+
+      <Navbar />
     </header>
   );
 };

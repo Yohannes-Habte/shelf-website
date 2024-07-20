@@ -1,0 +1,29 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.user-profile-page {
+  .user-profile-page-container {
+    .user-profile-page-title {
+      @include title;
+      background-color: #dfe7fd;
+    }
+
+    .user-profile-wrapper {
+      display: grid;
+      grid-template-columns: 15% 83%;
+      column-gap: 1rem;
+
+      .sidebar {
+        background-color: #eaf4f4;
+        @include shadow2;
+        margin-top: 1rem;
+      }
+
+      .main {
+        background-color: #f8f9fa;
+        @include shadow2;
+        margin-top: 1rem;
+      }
+    }
+  }
+}

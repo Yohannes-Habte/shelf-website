@@ -7,6 +7,7 @@ import "./database/db.js";
 
 // Routes
 import authUserRouter from "./routes/auth/index.js";
+import userRouter from "./routes/user/index.js";
 import globalErrorHandler from "./middlewares/globalError/index.js";
 import bookshelfRouter from "./routes/bookshelf/index.js";
 import bookRouter from "./routes/book/index.js";
@@ -32,6 +33,7 @@ dotenv.config();
 
 // End points
 app.use("/api/v1/auth", authUserRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/bookshelves", bookshelfRouter);
 app.use("/api/v1/books", bookRouter);
 app.use("/api/v1/borrowedBooks", borrowedBookRouter);

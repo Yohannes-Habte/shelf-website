@@ -1,4 +1,3 @@
-import React from 'react'
 import ClipLoader from "react-spinners/ClipLoader";
 
 const override = {
@@ -10,14 +9,14 @@ const override = {
 const ButtonLoader = () => {
   return (
     <ClipLoader
-    color={"green"}
-    loading={true}
-    cssOverride={override}
-    size={30}
-    aria-label="Loading Spinner"
-    data-testid="loader"
-  />
-  )
-}
+      color={"green"}
+      loading={true}
+      cssOverride={override}
+      size={30}
+      aria-label="Loading Spinner"
+      data-testid="loader"
+    />
+  );
+};
 
-export default ButtonLoader
+export default ButtonLoader;

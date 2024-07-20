@@ -2,7 +2,7 @@ import Rating from "../../models/ratings/index.js";
 import createError from "http-errors";
 
 //==========================================================================
-// Create New Borrowed book
+// Create New rating
 //==========================================================================
 export const createRating = async (req, res, next) => {
   try {
@@ -26,7 +26,7 @@ export const createRating = async (req, res, next) => {
 };
 
 //==========================================================================
-// Get all books
+// Get all ratings
 //==========================================================================
 export const getRatings = async (req, res, next) => {
   try {
@@ -46,7 +46,7 @@ export const getRatings = async (req, res, next) => {
 };
 
 //==========================================================================
-// Get single book
+// Get single rating
 //==========================================================================
 export const getRating = async (req, res, next) => {
   const ratingId = req.params.id;
@@ -64,5 +64,29 @@ export const getRating = async (req, res, next) => {
     });
   } catch (error) {
     return next(createError(400, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
+// Delete single rating
+//==========================================================================
+export const deleteRating = async (req, res, next) => {
+  const ratingId = req.params.id;
+
+  try {
+    const rating = await Rating.findById(ratingId);
+
+    if (!rating) {
+      return next(createError(404, "Rating does not exist!"));
+    }
+
+    await Rating.findByIdAndDelete(ratingId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Rating has been successfully deleted",
+    });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
   }
 };

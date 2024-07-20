@@ -6,6 +6,13 @@ const bookSchema = new Schema(
   {
     ISBN: { type: String, required: true, unique: true },
     title: { type: String, required: true },
+    genre: { type: mongoose.Types.ObjectId, ref: "Genre", required: true },
+    publishedDate: { type: Date },
+    language: { type: String, required: true },
+    publisher: { type: String, required: true },
+    coverImageUrl: { type: String },
+    summary: { type: String },
+
     authors: [
       {
         firstName: { type: String, required: true },
@@ -14,22 +21,15 @@ const bookSchema = new Schema(
         deathDate: { type: Date },
       },
     ],
-    publishedDate: { type: Date, required: true },
-    genres: [
-      {
-        _id: { type: mongoose.Types.ObjectId, ref: "Genre" },
-      },
-    ],
-    summary: { type: String, required: true },
+
     pages: { type: Number },
-    language: { type: String, required: true },
-    publisher: { type: String, required: true },
-    coverImageUrl: { type: String, required: true },
+
     borrowedTimes: [
       {
         _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },
       },
     ],
+
     status: {
       type: String,
       default: "available",
@@ -37,6 +37,7 @@ const bookSchema = new Schema(
     },
 
     ratings: { type: Number },
+
     reviews: [
       {
         user: { type: Object },
@@ -47,6 +48,7 @@ const bookSchema = new Schema(
       },
     ],
   },
+
   {
     timestamps: true,
   }

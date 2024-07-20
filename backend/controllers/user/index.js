@@ -3,63 +3,6 @@ import User from "../../models/user/index.js";
 import mongoose from "mongoose";
 
 //====================================================================
-// Update user address
-//====================================================================
-export const updateUserAddress = async (req, res, next) => {
-  const { username, email, ...updateUserAddress } = req.body;
-
-  try {
-    const user = await User.findOne({ username, email });
-
-    if (!user) {
-      return next(createError(404, "User not found! Please login!"));
-    }
-
-    Object.assign(user, updateUserAddress);
-
-    try {
-      await user.save();
-    } catch (error) {
-      return next(createError(500, "Address update could not be saved!"));
-    }
-
-    return res.status(200).json({
-      success: true,
-      result: user,
-      message: "Update is successful!",
-    });
-  } catch (error) {
-    return next(createError(500, "Server error! Please try again!"));
-  }
-};
-
-//====================================================================
-// Get single user
-//====================================================================
-export const getUser = async (req, res, next) => {
-  const userId = req.params.id;
-
-  // Validate the user ID
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
-  try {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return next(createError(404, "User not found! Please login!"));
-    }
-
-    return res.status(200).json({
-      success: true,
-      result: user,
-    });
-  } catch (error) {
-    return next(createError(500, "Server error! Please try again!"));
-  }
-};
-
-//====================================================================
 // Get all users
 //====================================================================
 export const getUsers = async (req, res, next) => {
@@ -111,6 +54,63 @@ export const getMembersBySearch = async (req, res, next) => {
     }
 
     return res.status(200).json({ success: true, result: users });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
+  }
+};
+
+//====================================================================
+// Get single user
+//====================================================================
+export const getUser = async (req, res, next) => {
+  const userId = req.params.id;
+
+  // Validate the user ID
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(createError(404, "User not found! Please login!"));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: user,
+    });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
+  }
+};
+
+//====================================================================
+// Update user address
+//====================================================================
+export const updateUserAddress = async (req, res, next) => {
+  const { username, email, ...updateUserAddress } = req.body;
+
+  try {
+    const user = await User.findOne({ username, email });
+
+    if (!user) {
+      return next(createError(404, "User not found! Please login!"));
+    }
+
+    Object.assign(user, updateUserAddress);
+
+    try {
+      await user.save();
+    } catch (error) {
+      return next(createError(500, "Address update could not be saved!"));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: user,
+      message: "Update is successful!",
+    });
   } catch (error) {
     return next(createError(500, "Server error! Please try again!"));
   }

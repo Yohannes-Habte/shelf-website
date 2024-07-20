@@ -1,0 +1,14 @@
+@import "../../styles/Variables.scss";
+@import "../../styles/Mixins.scss";
+
+/* Labtop screen size */
+
+.register-page {
+  .register-page-container {
+    @include form;
+
+    .register-page-title {
+      @include title;
+    }
+  }
+}

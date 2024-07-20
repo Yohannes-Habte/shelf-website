@@ -7,10 +7,10 @@ import generateToken from "../../middlewares/createToken/index.js";
 // Register new user
 //==========================================================================
 export const createUser = async (req, res, next) => {
-  const { username, firstName, lastName, email, password, agree } = req.body;
+  const { firstName, lastName, email, password, agree } = req.body;
 
   try {
-    const user = await User.findOne({ username, email });
+    const user = await User.findOne({ email });
 
     if (user) {
       return next(
@@ -20,7 +20,6 @@ export const createUser = async (req, res, next) => {
 
     if (!user) {
       const newUser = new User({
-        username,
         firstName,
         lastName,
         email,

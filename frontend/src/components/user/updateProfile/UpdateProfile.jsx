@@ -1,10 +1,24 @@
-import "./UpdateProfile.scss"
+import UserBorrowedBooks from "../userBorrowedBooks/UserBorrowedBooks";
+import UserDonatedBooks from "../userDonatedBooks/UserDonatedBooks";
+import UserInbox from "../userInbox/UserInbox";
 
-const UpdateProfile = () => {
+import "./UpdateProfile.scss";
+
+const UpdateProfile = ({ isActive }) => {
   return (
-    <section className="update-profile-container">
-      <h3 className="update-profile-title"> Update Profile</h3>
-    </section>
+    <article>
+      {isActive === 1 && (
+        <section className="update-profile-container">
+          <h3 className="update-profile-title"> Update Profile</h3>
+        </section>
+      )}
+
+      {isActive === 2 && <UserBorrowedBooks />}
+
+      {isActive === 3 && <UserDonatedBooks />}
+
+      {isActive === 4 && <UserInbox />}
+    </article>
   );
 };
 

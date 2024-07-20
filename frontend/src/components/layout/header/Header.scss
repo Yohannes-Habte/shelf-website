@@ -1,0 +1,8 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.header-container {
+  @include flexSpaceBetween;
+  background-color: $navbar-bg;
+  padding: 0.1rem 2rem;
+}
