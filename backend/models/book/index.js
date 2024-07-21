@@ -22,8 +22,6 @@ const bookSchema = new Schema(
       },
     ],
 
-    pages: { type: Number },
-
     borrowedTimes: [
       {
         _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },

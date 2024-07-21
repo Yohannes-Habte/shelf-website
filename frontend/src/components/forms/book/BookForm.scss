@@ -1,0 +1,52 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.book-modal {
+  @include modal;
+
+  .book-popup-box {
+    @include popupBox;
+    padding: 2rem;
+
+    .close-modal {
+      @include closeModal;
+    }
+
+    .book-form-title {
+      @include subTitle;
+    }
+
+    .book-form {
+      @include flexColumn;
+
+      .input-containers-wrapper {
+        @include twoGridTemplateEqualColumns;
+      }
+
+      .input-container {
+        @include inputContainer;
+
+        .input-icon {
+          @include inputIcon;
+        }
+
+        .input-field {
+          @include inputField;
+          color: $black;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+      }
+
+      .book-btn {
+        @include button1;
+      }
+    }
+  }
+}

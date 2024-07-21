@@ -41,6 +41,53 @@ export const createBookshelf = async (req, res, next) => {
 };
 
 //==========================================================================
+// Update book to add author/s
+//==========================================================================
+export const updateBookshelfAddress = async (req, res, next) => {
+  const {
+    bookshelfId,
+    longitude,
+    latitude,
+    street,
+    zipCode,
+    city,
+    state,
+    country,
+  } = req.body;
+
+
+  try {
+    const bookshelf = await Bookshelf.findById(bookshelfId);
+
+    if (!bookshelf) {
+      return next(createError(400, "Bookshelf does not exist!"));
+    }
+
+    const address = {
+      longitude,
+      latitude,
+      street,
+      zipCode,
+      city,
+      state,
+      country,
+    };
+
+    bookshelf.location.push(address);
+
+    await bookshelf.save();
+
+    return res.status(200).json({
+      success: true,
+      result: bookshelf,
+      message: "Bookshelf address is successfully added.",
+    });
+  } catch (error) {
+    return next(createError(400, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
 // Get all bookshelves
 //==========================================================================
 export const getBookshelves = async (req, res, next) => {

@@ -7,6 +7,7 @@ import { API } from "../../../utils/security/secreteKey";
 import BookshelfForm from "../../forms/bookshelf/BookshelfForm";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdEditSquare } from "react-icons/md";
+import BookshelfAddressForm from "../../forms/location/BookshelfAddressForm";
 
 const AllBookshelves = () => {
 
@@ -14,6 +15,8 @@ const AllBookshelves = () => {
   const [bookshelfId, setBookshelfId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [openBookshelf, setOpenBookshelf] = useState(false);
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -147,6 +150,7 @@ const AllBookshelves = () => {
       )}
 
       {openBookshelf && <BookshelfForm setOpenBookshelf={setOpenBookshelf} />}
+      <BookshelfAddressForm />
     </section>
   );
 };
