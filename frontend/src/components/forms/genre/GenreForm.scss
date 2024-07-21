@@ -1,42 +1,60 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
-.genre-form {
-  @include flexRow;
+.genre-modal {
+  @include modal;
 
-  .book-genre {
-    font-size: $nfs;
-  }
+  .genre-popup-box {
+    @include popupBox;
+    width: 50%;
+    padding: 2rem;
 
-  .input-container {
-    @include inputContainer;
-
-    .icon {
-      @include inputIcon;
+    .close-modal {
+      @include closeModal;
     }
 
-    .input-field {
-      @include inputField;
+    .genre-form-title {
+      @include subTitle;
     }
 
-    .input-label {
-      @include inputLabel;
-    }
+    .genre-form {
+      @include flexColumn;
 
-    .input-highlight {
-      @include inputHighlight;
-    }
+      .book-genre {
+        font-size: $nfs;
+      }
 
-    .input-field:focus + .input-label {
-      @include focusInputFieldAndInputLabel;
-    }
+      .input-container {
+        @include inputContainer;
 
-    .input-field:focus + .input-label + .input-highlight {
-      width: 100%;
-    }
+        .input-icon {
+          @include inputIcon;
+        }
 
-    .genre-btn {
-      @include button1;
+        .input-field {
+          @include inputField;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+
+        .input-field:focus + .input-label {
+          @include focusInputFieldAndInputLabel;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+      }
+
+      .genre-btn {
+        @include button1;
+      }
     }
   }
 }

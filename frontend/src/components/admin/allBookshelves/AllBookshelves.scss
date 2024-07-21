@@ -1,0 +1,35 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.bookshelves-table-container {
+  .bookshelves-table-title {
+    @include subTitle;
+  }
+
+  .add-new-bookshelf {
+    @include flexSpaceBetween;
+
+    .add-new-bookshelf-title {
+      @include subTitle;
+    }
+
+    .add-new-bookshelf-btn {
+      @include button2;
+    }
+  }
+}
+.action-wrapper {
+  @include flexRow;
+
+  .delete {
+    @include deleteIcon;
+  }
+
+  .edit {
+    @include editIcon;
+  }
+}
+
+.MuiDataGrid-cell {
+  @include flexCenter;
+}
