@@ -5,13 +5,12 @@ const Schema = mongoose.Schema;
 const borrowedBookSchema = new Schema(
   {
     ISBN: { type: String, required: true, unique: true },
+    book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
     title: { type: String, required: true },
     author: { type: String, required: true },
     dateBorrowed: { type: Date, default: Date.now },
     dueDate: { type: Date, required: true },
-    returnDate: { type: Date },
-
-    book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
+    returnDate: { type: Date,  required: true },
 
     borrowedFrom: {
       type: mongoose.Types.ObjectId,
@@ -44,8 +43,3 @@ const borrowedBookSchema = new Schema(
 const BorrowedBook = mongoose.model("BorrowedBook", borrowedBookSchema);
 
 export default BorrowedBook;
-
-
-
-
-

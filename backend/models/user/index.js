@@ -10,6 +10,11 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     image: { type: String, default: "https://i.ibb.co/4pDNDk1/avatar.png" },
+    banner: {
+      type: String,
+      default:
+        "http://res.cloudinary.com/dzlsa51a9/image/upload/v1721681810/upload/ll8xzwish2gazclcqq4m.png",
+    },
     street: { type: String },
     zipCode: { type: String },
     city: { type: String },

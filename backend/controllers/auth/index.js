@@ -115,14 +115,19 @@ export const loginUser = async (req, res, next) => {
 // Update user account
 //==========================================================================
 export const updateUser = async (req, res, next) => {
-  const { userId } = req.params;
-  const updateData = req.body;
+  const userId = req.params.userId;
+  const { email, password, ...updateData } = req.body;
 
   try {
     const user = await User.findById(userId);
 
     if (!user) {
       return next(createError(404, "User does not exist!"));
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return next(createError(400, "Incorrect password!"));
     }
 
     const updatedUser = await User.findByIdAndUpdate(

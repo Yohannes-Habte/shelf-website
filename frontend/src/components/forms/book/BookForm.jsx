@@ -13,6 +13,7 @@ import {
   upload_preset,
 } from "../../../utils/security/secreteKey";
 import { toast } from "react-toastify";
+import BookAuthor from "../author/BookAuthor";
 const initialValues = {
   ISBN: "",
   title: "",
@@ -28,6 +29,7 @@ const BookForm = ({ setOpenBook }) => {
   const [book, setBook] = useState(initialValues);
   const [bookshelves, setBookshelves] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [openBookAuthor, setOpenBookAuthor] = useState(false);
 
   const {
     ISBN,
@@ -302,6 +304,11 @@ const BookForm = ({ setOpenBook }) => {
             Add Book
           </button>
         </form>
+
+        <div className="add-author" onClick={() => setOpenBookAuthor(true)}>
+          Add Author
+        </div>
+        {openBookAuthor && <BookAuthor setOpenBookAuthor={setOpenBookAuthor} />}
       </section>
     </article>
   );

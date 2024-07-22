@@ -1,0 +1,49 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.bookshelf-location-modal {
+  @include modal;
+
+  .bookshelf-location-popup-box {
+    @include popupBox;
+    width: 600px;
+    padding: 2rem;
+
+    .close-modal {
+      @include closeModal;
+    }
+
+    .bookshelf-location-form-title {
+      @include subTitle;
+    }
+
+    .bookshelf-location-form {
+      @include flexColumn;
+
+      .input-container {
+        @include inputContainer;
+
+        .input-icon {
+          @include inputIcon;
+        }
+
+        .input-field {
+          @include inputField;
+          color: $black;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+      }
+
+      .bookshelf-location-form-btn {
+        @include button1;
+      }
+    }
+  }
+}

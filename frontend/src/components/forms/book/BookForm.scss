@@ -18,6 +18,7 @@
 
     .book-form {
       @include flexColumn;
+      position: relative;
 
       .input-containers-wrapper {
         @include twoGridTemplateEqualColumns;
@@ -47,6 +48,15 @@
       .book-btn {
         @include button1;
       }
+    }
+
+    .add-author {
+      position: absolute;
+      right: 1rem;
+      bottom: 2rem;
+      display: flex;
+      justify-content: flex-end;
+      @include button2;
     }
   }
 }

@@ -6,12 +6,12 @@ import { API } from "../../../utils/security/secreteKey";
 import { FaTrashAlt } from "react-icons/fa";
 import { useState } from "react";
 import BookForm from "../../forms/book/BookForm";
-import BookAuthor from "../../forms/author/BookAuthor";
 
 const AllBooks = () => {
   const [bookId, setBookId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [openBook, setOpenBook] = useState(false);
+
 
   const handleDelete = async (id) => {
     try {
@@ -121,8 +121,6 @@ const AllBooks = () => {
       )}
 
       {openBook && <BookForm setOpenBook={setOpenBook} />}
-
-      <BookAuthor />
     </section>
   );
 };

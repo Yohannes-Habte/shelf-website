@@ -41,13 +41,13 @@ export const createDonatedBook = async (req, res, next) => {
     await User.findByIdAndUpdate(
       userId,
       { $push: { donatedBooks: newDonatedBook._id } },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     await Bookshelf.findByIdAndUpdate(
       bookshelfId,
       { $push: { donatedBooks: newDonatedBook._id } },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     res.status(201).json({

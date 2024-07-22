@@ -1,24 +1,28 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
-.author-modal {
+.borrowed-book-modal {
   @include modal;
 
-  .author-popup-box {
+  .borrowed-book-popup-box {
     @include popupBox;
-    width: 600px;
+    width: 40%;
     padding: 2rem;
 
     .close-modal {
       @include closeModal;
     }
 
-    .author-form-title {
+    .borrowed-book-form-title {
       @include subTitle;
     }
 
-    .author-form {
+    .borrowed-book-form {
       @include flexColumn;
+
+      .input-containers-wrapper {
+        @include twoGridTemplateEqualColumns;
+      }
 
       .input-container {
         @include inputContainer;
@@ -41,7 +45,7 @@
         }
       }
 
-      .author-form-btn{
+      .borrowed-book-form-btn {
         @include button1;
       }
     }

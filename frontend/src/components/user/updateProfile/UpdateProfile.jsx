@@ -1,3 +1,4 @@
+import UpdateUserForm from "../../forms/updateUser/UpdateUserForm";
 import UserBorrowedBooks from "../userBorrowedBooks/UserBorrowedBooks";
 import UserDonatedBooks from "../userDonatedBooks/UserDonatedBooks";
 import UserInbox from "../userInbox/UserInbox";
@@ -10,6 +11,7 @@ const UpdateProfile = ({ isActive }) => {
       {isActive === 1 && (
         <section className="update-profile-container">
           <h3 className="update-profile-title"> Update Profile</h3>
+          <UpdateUserForm />
         </section>
       )}
 

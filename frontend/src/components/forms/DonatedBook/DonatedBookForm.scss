@@ -1,10 +1,10 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
-.author-modal {
+.donated-book-modal {
   @include modal;
 
-  .author-popup-box {
+  .donated-book-popup-box {
     @include popupBox;
     width: 600px;
     padding: 2rem;
@@ -13,12 +13,16 @@
       @include closeModal;
     }
 
-    .author-form-title {
+    .donated-book-form-title {
       @include subTitle;
     }
 
-    .author-form {
+    .donated-book-form {
       @include flexColumn;
+
+      .input-containers-wrapper {
+        @include twoGridTemplateEqualColumns;
+      }
 
       .input-container {
         @include inputContainer;
@@ -41,7 +45,7 @@
         }
       }
 
-      .author-form-btn{
+      .donated-book-form-btn {
         @include button1;
       }
     }

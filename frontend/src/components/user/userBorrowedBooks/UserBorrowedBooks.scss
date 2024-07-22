@@ -1,0 +1,31 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.borrowed-books-container {
+  .borrowed-books-title {
+    @include subTitle;
+  }
+
+  .add-new-borrowed-book {
+    @include flexSpaceBetween;
+
+    .add-new-borrowed-book-title {
+      @include subTitle;
+    }
+
+    .add-new-borrowed-book-btn {
+      @include button2;
+    }
+  }
+}
+.action-wrapper {
+  @include flexRow;
+
+  .delete {
+    @include deleteIcon;
+  }
+}
+
+.MuiDataGrid-cell {
+  @include flexCenter;
+}

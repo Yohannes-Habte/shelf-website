@@ -1,0 +1,48 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.user-profile-update-form {
+  @include flexColumn;
+  position: relative;
+  width: 70%;
+  margin: 1rem auto;
+  @include shadow2;
+  padding: 1rem 2rem 2rem 2rem;
+
+  .input-containers-wrapper {
+    @include twoGridTemplateEqualColumns;
+  }
+
+  .input-container {
+    @include inputContainer;
+
+    .input-icon {
+      @include inputIcon;
+    }
+
+    .input-field {
+      @include inputField;
+      color: $black;
+    }
+
+    .input-label {
+      @include inputLabel;
+    }
+
+    .input-highlight {
+      @include inputHighlight;
+    }
+
+    .input-field:focus + .input-label {
+      @include focusInputFieldAndInputLabel;
+    }
+
+    .input-field:focus + .input-label + .input-highlight {
+      width: 100%;
+    }
+  }
+
+  .update-user-profile-btn {
+    @include button1;
+  }
+}
