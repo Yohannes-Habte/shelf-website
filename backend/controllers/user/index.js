@@ -15,7 +15,7 @@ export const getUsers = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      users: users,
+      result: users,
     });
   } catch (error) {
     return next(createError(500, "Server error! Please try again!"));

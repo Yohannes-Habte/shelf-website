@@ -3,9 +3,23 @@
 
 .user-profile-page {
   .user-profile-page-container {
+    position: relative;
     .user-profile-page-title {
       @include title;
       background-color: #dfe7fd;
+      padding: 1.5rem;
+    }
+
+    .image-container {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      .user-image {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        cursor: pointer;
+      }
     }
 
     .user-profile-wrapper {

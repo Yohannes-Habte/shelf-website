@@ -1,0 +1,53 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.bookshelf-modal {
+  @include modal;
+
+  .bookshelf-popup-box {
+    @include popupBox;
+ 
+    padding: 2rem;
+
+    .close-modal {
+      @include closeModal;
+    }
+
+    .bookshelf-form-title {
+      @include subTitle;
+    }
+
+    .bookshelf-form {
+      @include flexColumn;
+
+      .input-containers-wrapper {
+        @include twoGridTemplateEqualColumns;
+      }
+
+      .input-container {
+        @include inputContainer;
+
+        .input-icon {
+          @include inputIcon;
+        }
+
+        .input-field {
+          @include inputField;
+          color: $black;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+      }
+
+      .bookshelf-btn {
+        @include button1;
+      }
+    }
+  }
+}

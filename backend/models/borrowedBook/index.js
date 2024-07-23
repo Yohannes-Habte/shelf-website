@@ -10,7 +10,6 @@ const borrowedBookSchema = new Schema(
     author: { type: String, required: true },
     dateBorrowed: { type: Date, default: Date.now },
     dueDate: { type: Date, required: true },
-    returnDate: { type: Date,  required: true },
 
     borrowedFrom: {
       type: mongoose.Types.ObjectId,

@@ -1,9 +1,11 @@
 import "./DonatedBookForm.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaBookMedical } from "react-icons/fa";
 import { FaUserTie } from "react-icons/fa";
 import { MdMessage } from "react-icons/md";
+import { API } from "../../../utils/security/secreteKey";
+import { toast } from "react-toastify";
 
 const DonatedBookForm = ({ setOpenDonatedBook }) => {
   // Step 1: Set up the initial state
@@ -12,9 +14,41 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
     author: "",
     ISBN: "",
     message: "",
+    bookshelfId: "",
+    userId: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
+  const [bookshelves, setBookshelves] = useState([]);
+  const [users, setUsers] = useState([]);
+
+  const { title, author, ISBN, message, bookshelfId, userId } = formData;
+
+  useEffect(() => {
+    // Fetch all bookshelves
+    const fetchBookshelves = async () => {
+      try {
+        const response = await axios.get(`${API}/bookshelves`);
+        setBookshelves(response.data.result);
+      } catch (error) {
+        toast.error("Error fetching bookshelves");
+      }
+    };
+    fetchBookshelves();
+  }, []);
+
+  useEffect(() => {
+    // Fetch all users
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${API}/users`);
+        setUsers(response.data.result);
+      } catch (error) {
+        toast.error("Error fetching users");
+      }
+    };
+    fetchUsers();
+  }, []);
 
   // Step 2: Create the handleChange function
   const handleChange = (e) => {
@@ -34,11 +68,12 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/donatedBooks", formData);
-      console.log("Book donated successfully:", response.data);
+      const { data } = await axios.post(`${API}/donatedBooks/new`, formData);
+      toast.success(data.message);
       handleReset();
     } catch (error) {
       console.error("Error donating book:", error);
+      toast.error("Error donating book");
     }
   };
 
@@ -48,7 +83,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
         <span className="close-modal" onClick={() => setOpenDonatedBook(false)}>
           X
         </span>
-        <h3 className="donated-book-form-title">Borrowed Book</h3>
+        <h3 className="donated-book-form-title">Donated Book</h3>
         <form onSubmit={handleSubmit} className="donated-book-form">
           {/* Title */}
           <div className="input-container">
@@ -56,7 +91,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <input
               type="text"
               name="title"
-              value={formData.title}
+              value={title}
               onChange={handleChange}
               placeholder="Title"
               className="input-field"
@@ -74,12 +109,11 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <input
               type="text"
               name="author"
-              value={formData.author}
+              value={author}
               onChange={handleChange}
               placeholder="Author"
               className="input-field"
-              required
-            />
+              />
             <label htmlFor="author" className="input-label">
               Author
             </label>
@@ -92,7 +126,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <input
               type="text"
               name="ISBN"
-              value={formData.ISBN}
+              value={ISBN}
               onChange={handleChange}
               placeholder="ISBN"
               className="input-field"
@@ -103,13 +137,59 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <span className="input-highlight"></span>
           </div>
 
+          {/* Select Bookshelf */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="bookshelfId"
+              value={bookshelfId}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">Select Bookshelf</option>
+              {bookshelves &&
+                bookshelves.map((shelf) => (
+                  <option key={shelf._id} value={shelf._id}>
+                    {shelf.name}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="shelfId" className="input-label">
+              Select Bookshelf
+            </label>
+            <span className="input-highlight"></span>
+          </div>
+
+          {/* Select Donator */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="userId"
+              value={userId}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">Select Donator</option>
+              {users &&
+                users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="userId" className="input-label">
+              Select Donator
+            </label>
+            <span className="input-highlight"></span>
+          </div>
+
           {/* Message */}
           <div className="input-container">
             <MdMessage className="input-icon" />
             <input
               type="text"
               name="message"
-              value={formData.message}
+              value={message}
               onChange={handleChange}
               placeholder="Message"
               className="input-field"
@@ -121,7 +201,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <span className="input-highlight"></span>
           </div>
 
-          <button type="button" className="donated-book-form-btn">
+          <button type="submit" className="donated-book-form-btn">
             Donate Book
           </button>
         </form>

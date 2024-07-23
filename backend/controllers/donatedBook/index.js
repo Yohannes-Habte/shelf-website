@@ -7,13 +7,16 @@ import Bookshelf from "../../models/bookshelf/index.js";
 // Create New Borrowed book
 //==========================================================================
 export const createDonatedBook = async (req, res, next) => {
-  const { userId, bookshelfId, ...donatedBookData } = req.body;
+  const { title, author, ISBN, message, bookshelfId, userId } = req.body;
 
-  if (!title || !author || !ISBN || !message || !userId || !bookshelfId) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+  // Log incoming request data
+  console.log("Incoming request data:", req.body);
 
   try {
+    if (!title || !author || !ISBN || !userId || !bookshelfId) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ message: "User not found" });
@@ -30,11 +33,17 @@ export const createDonatedBook = async (req, res, next) => {
       return next(createError(400, "Book already donated!"));
     }
 
-    const newDonatedBook = new DonatedBook(donatedBookData);
+    const newDonatedBook = new DonatedBook({
+      title,
+      author,
+      ISBN,
+      message,
+    });
 
     try {
       await newDonatedBook.save();
     } catch (error) {
+      console.log(error);
       return next(createError(500, "Donated book not saved!"));
     }
 
@@ -53,9 +62,9 @@ export const createDonatedBook = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Donated book created successfully",
-      donatedBook: newDonatedBook,
     });
   } catch (error) {
+    console.log(error);
     return next(createError(500, "Server error! please try again!"));
   }
 };

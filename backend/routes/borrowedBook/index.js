@@ -7,7 +7,7 @@ import {
 
 const borrowedBookRouter = express.Router();
 
-borrowedBookRouter.post("/new", createBorrowedBook);
+borrowedBookRouter.post("/new/:id", createBorrowedBook);
 borrowedBookRouter.get("/", getBorrowedBooks);
 borrowedBookRouter.get("/:id", getBorrowedBook);
 

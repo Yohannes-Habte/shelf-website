@@ -4,7 +4,7 @@ import {
   deleteBookshelf,
   getBookshelf,
   getBookshelves,
-  updateBookshelfAddress,
+  updateBookshelf,
 } from "../../controllers/bookshelf/index.js";
 
 const bookshelfRouter = express.Router();
@@ -12,7 +12,7 @@ const bookshelfRouter = express.Router();
 bookshelfRouter.post("/new", createBookshelf);
 bookshelfRouter.get("/", getBookshelves);
 bookshelfRouter.get("/:id", getBookshelf);
-bookshelfRouter.put("/:id", updateBookshelfAddress);
+bookshelfRouter.put("/:id", updateBookshelf);
 bookshelfRouter.delete("/:id", deleteBookshelf);
 
 export default bookshelfRouter;

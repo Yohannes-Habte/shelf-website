@@ -3,26 +3,28 @@ import axios from "axios";
 import { FaBookMedical } from "react-icons/fa";
 import "./BorrowedBookForm.scss";
 import { API } from "../../../utils/security/secreteKey";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const initialValues = {
   ISBN: "",
   title: "",
   author: "",
-  dateBorrowed: "",
   dueDate: "",
-  returnDate: "",
   book: "",
   borrowedFrom: "",
 };
 const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
+  const { currentUser } = useSelector((state) => state.user);
   // Local variables
   const [formData, setFormData] = useState(initialValues);
   const [books, setBooks] = useState([]);
+  const [authors, setAuthors] = useState([]);
   const [bookshelves, setBookshelves] = useState([]);
 
   useEffect(() => {
     // Fetch books and bookshelves from the backend
-    const fetchData = async () => {
+    const fetchBookshelves = async () => {
       try {
         const { data } = await axios.get(`${API}/bookshelves`);
         setBookshelves(data.result);
@@ -31,12 +33,12 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
       }
     };
 
-    fetchData();
+    fetchBookshelves();
   }, []);
 
   useEffect(() => {
     // Fetch books and bookshelves from the backend
-    const fetchData = async () => {
+    const fetchBooks = async () => {
       try {
         const { data } = await axios.get(`${API}/books`);
         setBooks(data.result);
@@ -45,8 +47,19 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
       }
     };
 
-    fetchData();
+    fetchBooks();
   }, []);
+
+  // Extract authors from books
+  useEffect(() => {
+    const allAuthors = [];
+    books.forEach((book) => {
+      if (book.authors && book.authors.length > 0) {
+        book.authors.forEach((author) => allAuthors.push(author));
+      }
+    });
+    setAuthors(allAuthors);
+  }, [books]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,11 +76,12 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API}/borrowedBooks/${"currentUser._id"}/new`,
+      const { data } = await axios.post(
+        `${API}/borrowedBooks/new/${currentUser._id}`,
         formData
       );
-      console.log("BorrowedBook created successfully:", response.data);
+
+      toast.success(data.message);
 
       handleReset();
     } catch (error) {
@@ -115,11 +129,13 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
                 className="input-field"
               >
                 <option value="">Select a book</option>
-                {books.map((book) => (
-                  <option key={book._id} value={book._id}>
-                    {book.title}
-                  </option>
-                ))}
+                {books &&
+                  books.length !== 0 &&
+                  books.map((book) => (
+                    <option key={book._id} value={book._id}>
+                      {book.title}
+                    </option>
+                  ))}
               </select>
               <label htmlFor="book" className="input-label">
                 Book
@@ -140,9 +156,10 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
               >
                 <option value="">Select Title </option>
                 {books &&
-                  books?.authors?.map((author) => (
-                    <option key={author.id} value={author._id}>
-                      {author.title}
+                  books.length > 0 &&
+                  books.map((book) => (
+                    <option key={book.id} value={book._id}>
+                      {book.title}
                     </option>
                   ))}
               </select>
@@ -163,32 +180,16 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
                 required
               >
                 <option value="">Select Author</option>
-                {books &&
-                  books?.authors?.map((author) => (
-                    <option key={author.id} value={author._id}>
+                {authors &&
+                  authors.length > 0 &&
+                  authors.map((author) => (
+                    <option key={author._id} value={author._id}>
                       {author.firstName} {author.lastName}
                     </option>
                   ))}
               </select>
               <label htmlFor="author" className="input-label">
                 Author
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            {/* Date Borrowed */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <input
-                type="date"
-                name="dateBorrowed"
-                value={formData.dateBorrowed}
-                onChange={handleChange}
-                placeholder="Date Borrowed"
-                className="input-field"
-              />
-              <label htmlFor="dateBorrowed" className="input-label">
-                Date Borrowed
               </label>
               <span className="input-highlight"></span>
             </div>
@@ -206,23 +207,6 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
               />
               <label htmlFor="dueDate" className="input-label">
                 Due Date
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            {/* Return Date */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <input
-                type="date"
-                name="returnDate"
-                value={formData.returnDate}
-                onChange={handleChange}
-                placeholder="Return Date"
-                className="input-field"
-              />
-              <label htmlFor="returnDate" className="input-label">
-                Return Date
               </label>
               <span className="input-highlight"></span>
             </div>

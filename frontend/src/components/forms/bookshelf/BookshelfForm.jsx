@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import "./BookshelfForm.scss";
-import ReactIcons from "../../reactIcons/ReactIcons";
+import { Country, State, City } from "country-state-city";
 import { useDispatch, useSelector } from "react-redux";
 import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
 import { GiBookshelf } from "react-icons/gi";
-import { FaCloudUploadAlt } from "react-icons/fa";
+import {
+  FaCloudUploadAlt,
+  FaGlobeAmericas,
+  FaMapMarkedAlt,
+  FaCity,
+  FaEnvelope,
+  FaRoad,
+  FaLocationArrow,
+} from "react-icons/fa";
 import { MdAccessTimeFilled } from "react-icons/md";
 import {
   API,
@@ -17,41 +25,57 @@ import * as ACTION from "../../../redux/reducers/bookshelf/bookshelfReducer";
 import { toast } from "react-toastify";
 
 const initialState = {
-  barcode: "",
   image: null,
   name: "",
-  openingHours: "",
+  country: "",
+  state: "",
+  city: "",
+  zipCode: "",
+  street: "",
+  longitude: "",
+  latitude: "",
+  openingTime: "09:00",  // Default opening time
+  closingTime: "18:00",  // Default closing time
 };
 
 const BookshelfForm = ({ setOpenBookshelf }) => {
-  // Global icons
-  const { bookshelfIcon } = ReactIcons();
-
   // Global state variables
   const { loading, error } = useSelector((state) => state.bookshelf);
   const dispatch = useDispatch();
 
   // Local state variables
-  const [state, setState] = useState(initialState);
-  const { barcode, image, name, openingHours } = state;
+  const [formState, setFormState] = useState(initialState);
+  const {
+    image,
+    name,
+    country,
+    state: stateName,
+    city,
+    zipCode,
+    street,
+    longitude,
+    latitude,
+    openingTime,
+    closingTime,
+  } = formState;
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     if (type === "file") {
-      setState({
-        ...state,
+      setFormState({
+        ...formState,
         [name]: files[0],
       });
     } else {
-      setState({
-        ...state,
+      setFormState({
+        ...formState,
         [name]: value,
       });
     }
   };
 
   const handleReset = () => {
-    setState(initialState);
+    setFormState(initialState);
   };
 
   // Clear errors when the component mounts
@@ -61,22 +85,32 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Image validation
-    const shelfPhoto = new FormData();
-    shelfPhoto.append("file", image);
-    shelfPhoto.append("cloud_name", cloud_name);
-    shelfPhoto.append("upload_preset", upload_preset);
 
-    // Save image to cloudinary
-    const response = await axios.post(cloud_URL, shelfPhoto);
-    const { url } = response.data;
     try {
+      // Image validation and upload
+      const shelfPhoto = new FormData();
+      shelfPhoto.append("file", image);
+      shelfPhoto.append("cloud_name", cloud_name);
+      shelfPhoto.append("upload_preset", upload_preset);
+
+      // Save image to Cloudinary
+      const response = await axios.post(cloud_URL, shelfPhoto);
+      const { url } = response.data;
+
       const newBookshelf = {
-        barcode: barcode,
         image: url,
-        name: name,
-        openingHours: openingHours,
+        name,
+        country,
+        state: stateName,
+        city,
+        zipCode,
+        street,
+        longitude,
+        latitude,
+        openingTime,
+        closingTime,
       };
+
       dispatch(ACTION.postBookshelfStart());
       const { data } = await axios.post(`${API}/bookshelves/new`, newBookshelf);
       dispatch(ACTION.postBookshelfSuccess(data.message));
@@ -94,76 +128,211 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
           X
         </span>
         <h3 className="bookshelf-form-title">Add New Bookshelf</h3>
-        <form onSubmit={handleSubmit} action="" className="bookshelf-form">
-          {/* Bookshelf Barcode */}
-          <div className="input-container">
-            <GiBookshelf className="input-icon" />
+        <form onSubmit={handleSubmit} className="bookshelf-form">
+          <div className="input-containers-wrapper">
+            {/* Bookshelf Photo */}
+            <div className="input-container">
+              <FaCloudUploadAlt className="input-icon" />
+              <input
+                type="file"
+                name="image"
+                onChange={handleChange}
+                className="input-field"
+              />
+              <label htmlFor="image" className="input-label">
+                Upload Bookshelf Photo
+              </label>
+              <span className="input-highlight"></span>
+            </div>
 
-            <input
-              type="text"
-              name="barcode"
-              value={barcode}
-              onChange={handleChange}
-              placeholder="Bookshelf Barcode"
-              className="input-field"
-            />
-            <label htmlFor="" className="input-label">
-              Barcode
-            </label>
-            <span className="input-highlight"></span>
+            {/* Bookshelf Name */}
+            <div className="input-container">
+              <GiBookshelf className="input-icon" />
+              <input
+                type="text"
+                name="name"
+                value={name}
+                onChange={handleChange}
+                placeholder="Bookshelf Name"
+                className="input-field"
+                required
+              />
+              <label htmlFor="name" className="input-label">
+                Name
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Select Country */}
+            <div className="input-container">
+              <FaGlobeAmericas className="input-icon" />
+              <select
+                name="country"
+                id="country"
+                value={country}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your country</option>
+                {Country &&
+                  Country.getAllCountries().map((country) => (
+                    <option key={country.isoCode} value={country.isoCode}>
+                      {country.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Select State */}
+            <div className="input-container">
+              <FaMapMarkedAlt className="input-icon" />
+              <select
+                name="state"
+                id="state"
+                value={stateName}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your state</option>
+                {State &&
+                  State.getStatesOfCountry(country).map((state) => (
+                    <option key={state.isoCode} value={state.isoCode}>
+                      {state.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Select City */}
+            <div className="input-container">
+              <FaCity className="input-icon" />
+              <select
+                name="city"
+                id="city"
+                value={city}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your city</option>
+                {City &&
+                  City.getCitiesOfState(country, stateName).map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Zip Code */}
+            <div className="input-container">
+              <FaEnvelope className="input-icon" />
+              <input
+                type="text"
+                name="zipCode"
+                value={zipCode}
+                onChange={handleChange}
+                placeholder="Zip Code"
+                className="input-field"
+                required
+              />
+              <label htmlFor="zipCode" className="input-label">
+                Zip Code
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Street */}
+            <div className="input-container">
+              <FaRoad className="input-icon" />
+              <input
+                type="text"
+                name="street"
+                value={street}
+                onChange={handleChange}
+                placeholder="Street"
+                className="input-field"
+                required
+              />
+              <label htmlFor="street" className="input-label">
+                Street
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Longitude */}
+            <div className="input-container">
+              <FaLocationArrow className="input-icon" />
+              <input
+                type="text"
+                name="longitude"
+                value={longitude}
+                onChange={handleChange}
+                placeholder="Longitude"
+                className="input-field"
+                required
+              />
+              <label htmlFor="longitude" className="input-label">
+                Longitude
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Latitude */}
+            <div className="input-container">
+              <FaLocationArrow className="input-icon" />
+              <input
+                type="text"
+                name="latitude"
+                value={latitude}
+                onChange={handleChange}
+                placeholder="Latitude"
+                className="input-field"
+              />
+              <label htmlFor="latitude" className="input-label">
+                Latitude
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Opening Time */}
+            <div className="input-container">
+              <MdAccessTimeFilled className="input-icon" />
+              <input
+                type="time"
+                name="openingTime"
+                value={openingTime}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+              <label htmlFor="openingTime" className="input-label">
+                Opening Time
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Closing Time */}
+            <div className="input-container">
+              <MdAccessTimeFilled className="input-icon" />
+              <input
+                type="time"
+                name="closingTime"
+                value={closingTime}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+              <label htmlFor="closingTime" className="input-label">
+                Closing Time
+              </label>
+              <span className="input-highlight"></span>
+            </div>
           </div>
 
-          {/* Bookshelf Photo */}
-          <div className="input-container">
-            <FaCloudUploadAlt className="input-icon" />
-            <input
-              type="file"
-              name="image"
-              onChange={handleChange}
-              className="input-field"
-            />
-            <label htmlFor="" className="input-label">
-              Barcode
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          {/* Bookshelf Name */}
-          <div className="input-container">
-            <span className="input-icon"> {bookshelfIcon} </span>
-            <GiBookshelf className="input-icon" />
-            <input
-              type="text"
-              name="name"
-              value={name}
-              onChange={handleChange}
-              placeholder="Bookshelf Name"
-              className="input-field"
-            />
-            <label htmlFor="" className="input-label">
-              Name
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          {/* Bookshelf Opening Hours */}
-          <div className="input-container">
-            <MdAccessTimeFilled className="input-icon" />
-            <input
-              type="text"
-              name="openingHours"
-              value={openingHours}
-              onChange={handleChange}
-              placeholder="Bookshelf Opening Hours"
-              className="input-field"
-            />
-            <label htmlFor="" className="input-label">
-              Opening Hours
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          {/* Button for log in form */}
+          {/* Submit Button */}
           <button className="bookshelf-btn" disabled={loading}>
             {loading ? (
               <span className="loading">
@@ -174,7 +343,7 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
             )}
           </button>
         </form>
-        {error ? <p className="error-message"> {error} </p> : null}
+        {error && <p className="error-message">{error}</p>}
       </section>
     </article>
   );

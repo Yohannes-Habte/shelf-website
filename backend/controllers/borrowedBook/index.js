@@ -8,43 +8,49 @@ import Bookshelf from "../../models/bookshelf/index.js";
 // Create New Borrowed book
 //==========================================================================
 export const createBorrowedBook = async (req, res, next) => {
-  const { bookId, bookshelfId, dueDate } = req.body;
-  const userId = req.user._id;
+  const {
+    ISBN,
+    title,
+    author,
+    dueDate,
+    book: bookId,
+    borrowedFrom: bookshelfId,
+  } = req.body;
+
+  const userId = req.params.id;
 
   try {
     const user = await User.findById(userId);
     const book = await Book.findById(bookId);
     const bookshelf = await Bookshelf.findById(bookshelfId);
 
-    if (!user || !book || !bookshelf) {
-      return res
-        .status(404)
-        .json({ error: "User, Book, or Bookshelf not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    if (!bookshelf) {
+      return res.status(404).json({ message: "Bookshelf not found" });
     }
 
-    // Create new BorrowedBook
     const borrowedBook = new BorrowedBook({
-      ISBN: book.ISBN,
-      title: book.title,
-      author: book.authors
-        .map((author) => `${author.firstName} ${author.lastName}`)
-        .join(", "),
-      dueDate,
-      book: book._id,
-      borrowedFrom: bookshelf._id,
+      ISBN: ISBN,
+      title: title,
+      author: author,
+      dueDate: dueDate,
+      book: bookId,
+      borrowedFrom: bookshelfId,
     });
 
     await borrowedBook.save();
 
-    // Update User model
     user.borrowedBooks.push(borrowedBook._id);
     await user.save();
 
-    // Update Bookshelf model
     bookshelf.borrowedBooks.push(borrowedBook._id);
     await bookshelf.save();
 
-    // Update Book model
     book.status = "borrowed";
     book.borrowedTimes.push(borrowedBook._id);
     await book.save();

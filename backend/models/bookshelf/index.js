@@ -5,19 +5,17 @@ const { Schema } = mongoose;
 const bookshelfSchema = new Schema(
   {
     barcode: { type: String, required: true, unique: true },
-    image: { type: String, required: true },
+    image: [{ type: String, required: true }],
     name: { type: String, required: true },
-    location: [
-      {
-        longitude: { type: String, required: true },
-        latitude: { type: String, required: true },
-        street: { type: String, required: true },
-        zipCode: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        country: { type: String, required: true },
-      },
-    ],
+    country: { type: String, required: true },
+    state: { type: String, required: true },
+    city: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    street: { type: String, required: true },
+    longitude: { type: String, required: true },
+    latitude: { type: String, required: true },
+    openingTime: { type: String, required: true },
+    closingTime: { type: String, required: true },
 
     books: [{ _id: { type: mongoose.Types.ObjectId, ref: "Book" } }],
 
@@ -44,12 +42,10 @@ const bookshelfSchema = new Schema(
       },
     ],
 
-    openingHours: { type: String, required: true },
+ 
   },
   { timestamps: true }
 );
 
 const Bookshelf = mongoose.model("Bookshelf", bookshelfSchema);
 export default Bookshelf;
-
-
