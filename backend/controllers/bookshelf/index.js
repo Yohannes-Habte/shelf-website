@@ -6,6 +6,78 @@ import { v4 as uuidv4 } from "uuid";
 // Create a bookshelf
 //==========================================================================
 
+// export const createBookshelf = async (req, res, next) => {
+//   const {
+//     image,
+//     name,
+//     country,
+//     state,
+//     city,
+//     zipCode,
+//     street,
+//     longitude,
+//     latitude,
+//     openingTime,
+//     closingTime,
+//   } = req.body;
+
+//   try {
+//     // Generate a unique barcode
+//     const barcode = uuidv4();
+//     /*
+//     Other methods to generate unique barcode:
+//     1. mongoose object id
+//         const barcode = new mongoose.Types.ObjectId().toString();
+//     2. nanoid
+//         npm install nanoid
+//         import { nanoid } from 'nanoid';
+//         const barcode = nanoid();
+
+//     3. Custom Barcode Generation
+//         const generateBarcode = () => {
+//         return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+//         }
+//          const barcode = generateBarcode();
+//     */
+
+//     // Check if the bookshelf already exists
+//     const existingBookshelf = await Bookshelf.findOne({ barcode });
+
+//     if (existingBookshelf) {
+//       return next(createError(400, "Bookshelf already exists!"));
+//     }
+
+//     // Create a new bookshelf instance
+//     const newBookshelf = new Bookshelf({
+//       barcode,
+//       image,
+//       name,
+//       country,
+//       state,
+//       city,
+//       zipCode,
+//       street,
+//       longitude,
+//       latitude,
+//       openingTime,
+//       closingTime,
+//     });
+
+//     // Save the new bookshelf to the database
+//     await newBookshelf.save();
+
+//     // Respond with success message
+//     res.status(201).json({
+//       success: true,
+//       result: newBookshelf,
+//       message: "Bookshelf successfully created!",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return next(createError(500, "Server error! Please try again!"));
+//   }
+// };
+
 export const createBookshelf = async (req, res, next) => {
   const {
     image,
@@ -21,30 +93,33 @@ export const createBookshelf = async (req, res, next) => {
     closingTime,
   } = req.body;
 
+  // Validate the required fields
+  if (
+    !image ||
+    !name ||
+    !country ||
+    !state ||
+    !city ||
+    !zipCode ||
+    !street ||
+    !longitude ||
+    !latitude ||
+    !openingTime ||
+    !closingTime
+  ) {
+    return next(createError(400, "All fields are required"));
+  }
+
   try {
     // Generate a unique barcode
     const barcode = uuidv4();
-    /*
-    Other methods to generate unique barcode:
-    1. mongoose object id
-        const barcode = new mongoose.Types.ObjectId().toString();
-    2. nanoid
-        npm install nanoid
-        import { nanoid } from 'nanoid';
-        const barcode = nanoid();
-
-    3. Custom Barcode Generation
-        const generateBarcode = () => {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-        }
-         const barcode = generateBarcode();
-    */
 
     // Check if the bookshelf already exists
     const existingBookshelf = await Bookshelf.findOne({ barcode });
-
     if (existingBookshelf) {
-      return next(createError(400, "Bookshelf already exists!"));
+      return next(
+        createError(400, "Bookshelf with this barcode already exists!")
+      );
     }
 
     // Create a new bookshelf instance
@@ -57,8 +132,10 @@ export const createBookshelf = async (req, res, next) => {
       city,
       zipCode,
       street,
-      longitude,
-      latitude,
+      location: {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      },
       openingTime,
       closingTime,
     });
@@ -77,7 +154,6 @@ export const createBookshelf = async (req, res, next) => {
     return next(createError(500, "Server error! Please try again!"));
   }
 };
-
 //==========================================================================
 // Update bookshelf
 //==========================================================================
@@ -143,9 +219,26 @@ export const updateBookshelf = async (req, res, next) => {
 //==========================================================================
 export const getBookshelves = async (req, res, next) => {
   try {
-    const bookshelves = await Bookshelf.find();
+    const { search } = req.query;
 
-    if (!bookshelves) {
+    let query = {};
+
+    if (search) {
+      // If search parameter is provided, construct the query with $or conditions
+      query = {
+        $or: [
+          { name: new RegExp(search, 'i') },
+          { country: new RegExp(search, 'i') },
+          { state: new RegExp(search, 'i') },
+          { city: new RegExp(search, 'i') },
+        ],
+      };
+    }
+
+    // Find bookshelves based on the constructed query or return all if no query
+    const bookshelves = await Bookshelf.find(query);
+
+    if (!bookshelves || bookshelves.length === 0) {
       return next(createError(400, "Bookshelves not found!"));
     }
 
@@ -154,7 +247,7 @@ export const getBookshelves = async (req, res, next) => {
       result: bookshelves,
     });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    return next(createError(500, "Server error! Please try again!"));
   }
 };
 

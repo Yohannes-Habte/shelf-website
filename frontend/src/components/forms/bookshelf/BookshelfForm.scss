@@ -5,8 +5,9 @@
   @include modal;
 
   .bookshelf-popup-box {
+    width: 70%;
     @include popupBox;
- 
+
     padding: 2rem;
 
     .close-modal {
@@ -15,6 +16,11 @@
 
     .bookshelf-form-title {
       @include subTitle;
+    }
+
+    .form-map-wrapper {
+      display: grid;
+      grid-template-columns: 60% 40%;
     }
 
     .bookshelf-form {
@@ -32,8 +38,8 @@
         }
 
         .input-field {
-          @include inputField;
           color: $black;
+          @include inputField;
         }
 
         .input-label {

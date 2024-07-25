@@ -32,8 +32,9 @@
         }
 
         .input-field {
-          @include inputField;
           color: $black;
+          @include inputField;
+          
         }
 
         .input-label {
