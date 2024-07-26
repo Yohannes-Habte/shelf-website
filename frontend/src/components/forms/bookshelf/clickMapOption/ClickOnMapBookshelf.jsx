@@ -1,9 +1,8 @@
-import { useRef, useState, useContext } from "react";
+import { useState, useRef } from "react";
 import { Country, State, City } from "country-state-city";
 import { useDispatch, useSelector } from "react-redux";
-import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
+
 import { GiBookshelf } from "react-icons/gi";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 import {
   FaCloudUploadAlt,
@@ -19,12 +18,13 @@ import {
   cloud_name,
   cloud_URL,
   upload_preset,
-} from "../../../utils/security/secreteKey";
+} from "../../../../utils/security/secreteKey";
 import axios from "axios";
-import * as ACTION from "../../../redux/reducers/bookshelf/bookshelfReducer";
 import { toast } from "react-toastify";
-import { UserLocationContext } from "../../../context/userLocation/UserLocationProvider";
-import "./BookshelfForm.scss";
+import "../BookshelfForm.scss";
+import BookshelfMap from "./BookshelfMap";
+import ButtonLoader from "../../../../utils/loader/buttonLoader/ButtonLoader";
+import * as ACTION from "../../../../redux/reducers/bookshelf/bookshelfReducer";
 
 const initialState = {
   image: null,
@@ -38,17 +38,21 @@ const initialState = {
   closingTime: "18:00", // Default closing time
 };
 
-const BookshelfForm = ({ setOpenBookshelf }) => {
-  const mapRef = useRef(null);
-
-  const { userLocation, isLoading, error } = useContext(UserLocationContext);
+const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
 
   // Global state variables (from Redux)
   const { loading, error: formError } = useSelector((state) => state.bookshelf);
   const dispatch = useDispatch();
 
+  // Bookshelf map local variables
+  const mapRef = useRef(null);
+  const [markerPosition, setMarkerPosition] = useState(null);
+  const [clickPosition, setClickPosition] = useState(null);
+  console.log("position=", clickPosition);
+
   // Local state variables
   const [formState, setFormState] = useState(initialState);
+
   const {
     image,
     name,
@@ -84,17 +88,7 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLoading) {
-      // Display a message or disable the form button while user location is loading
-      console.warn("User location is still being fetched. Please wait.");
-      return;
-    }
-
-    if (error) {
-      // Handle errors fetching user location (consider displaying an error message to the user)
-      console.error("Error getting user location:", error);
-      return;
-    }
+  
 
     try {
       // Image validation and upload (using FormData)
@@ -115,9 +109,10 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
         city,
         zipCode,
         street,
-        // Use userLocation if available, otherwise set latitude and longitude to null
-        longitude: userLocation?.longitude || null,
-        latitude: userLocation?.latitude || null,
+        // longitude: userLocation?.longitude || null,
+        // latitude: userLocation?.latitude || null,
+        longitude: clickPosition[0],
+        latitude: clickPosition[1],
         openingTime,
         closingTime,
       };
@@ -134,7 +129,7 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
   return (
     <article className="bookshelf-modal">
       <section className="bookshelf-popup-box">
-        <span className="close-modal" onClick={() => setOpenBookshelf(false)}>
+        <span className="close-modal" onClick={() => setOpenClickMapBookshelf(false)}>
           X
         </span>
         <h3 className="bookshelf-form-title">Add New Bookshelf</h3>
@@ -322,58 +317,13 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
           </form>
 
           <div className="px-2">
-            <MapContainer
-              // center={center}
-              zoom={5}
-              scrollWheelZoom={true}
-              whenCreated={(mapInstance) => {
-                mapRef.current = mapInstance;
-                console.log("Map instance created:", mapRef.current);
-              }}
-              style={{ height: "500px", width: "100%" }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {/* {bookshelves?.map((shelf) => ( */}
-              {/* <Marker
-            key={shelf._id}
-            position={shelf?.location?.coordinates}
-            icon={customIcon}
-          >
-            <Popup>
-              <div style={{ maxWidth: "200px" }}>
-                <h3>{shelf?.name}</h3>
-                <p>{shelf?.street}</p>
-                {shelf?.image && (
-                  <img
-                    src={shelf?.image}
-                    alt={shelf?.name}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      borderRadius: "5px",
-                    }}
-                  />
-                )}
-                <button
-                  onClick={() => setDestination(shelf?.location?.coordinates)}
-                  style={{ marginTop: "10px" }}
-                >
-                  Go Here
-                </button>
-              </div>
-            </Popup>
-          </Marker> */}
-              {/* ))} */}
-              {/* <LocationMarker /> */}
-              {/* {userLocation && destination && (
-          <UserStartAndDestination start={userLocation} end={destination} />
-        )} */}
-              {/* {mapReady && <MiniMapSettings position="topright" zoom={0} />} */}
-              {/* {<MiniMapSettings position="topright" zoom={0} />} */}
-            </MapContainer>
+            <BookshelfMap
+              mapRef={mapRef}
+              markerPosition={markerPosition}
+              setMarkerPosition={setMarkerPosition}
+              clickPosition={clickPosition}
+              setClickPosition={setClickPosition}
+            />
           </div>
         </div>
 
@@ -383,4 +333,6 @@ const BookshelfForm = ({ setOpenBookshelf }) => {
   );
 };
 
-export default BookshelfForm;
+
+
+export default ClickOnMapBookshelf

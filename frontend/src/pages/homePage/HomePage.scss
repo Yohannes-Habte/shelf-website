@@ -1,0 +1,12 @@
+@import "../../styles/Variables.scss";
+@import "../../styles/Mixins.scss";
+
+.home-page {
+  .home-page-container {
+    width: $desktop;
+    margin: 1rem auto;
+    .home-page-title {
+      @include title;
+    }
+  }
+}

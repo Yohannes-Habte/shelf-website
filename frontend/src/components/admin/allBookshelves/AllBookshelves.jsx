@@ -4,18 +4,21 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { API } from "../../../utils/security/secreteKey";
-import BookshelfForm from "../../forms/bookshelf/BookshelfForm";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdEditSquare } from "react-icons/md";
+import ClickOnMapBookshelf from "../../forms/bookshelf/clickMapOption/ClickOnMapBookshelf";
+import UserLocationBookshelf from "../../forms/bookshelf/userLocationOption/UserLocationBookshelf";
+import SearchLocationBookshelf from "../../forms/bookshelf/searchLocationOption/SearchLocationBookshelf";
 
 const AllBookshelves = () => {
-
   // Local state variable
   const [bookshelfId, setBookshelfId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
-  const [openBookshelf, setOpenBookshelf] = useState(false);
-
-
+  const [openClickMapBookshelf, setOpenClickMapBookshelf] = useState(false);
+  const [openUserLocationBookshelf, setOpenUserLocationBookshelf] =
+    useState(false);
+  const [openSearchLocationBookshelf, setOpenSearchLocationBookshelf] =
+    useState(false);
 
   const handleDelete = async (id) => {
     try {
@@ -47,7 +50,7 @@ const AllBookshelves = () => {
           <div className="action-wrapper">
             <MdEditSquare
               className="edit"
-              onClick={() => setOpenBookshelf(true)}
+              onClick={() => setOpenClickMapBookshelf(true)}
             />
 
             <FaTrashAlt
@@ -82,13 +85,31 @@ const AllBookshelves = () => {
       <h3 className="bookshelves-table-title"> List of Bookshelves </h3>
 
       <aside className="add-new-bookshelf">
-        <h3 className="add-new-bookshelf-title">Add New Bookshelf</h3>
-        <button
-          onClick={() => setOpenBookshelf(true)}
-          className="add-new-bookshelf-btn"
-        >
-          Add New
-        </button>
+        <h3 className="add-new-bookshelf-title">
+          Options to Add New Bookshelf
+        </h3>
+        <div>
+          <button
+            onClick={() => setOpenClickMapBookshelf(true)}
+            className="add-new-bookshelf-btn"
+          >
+            Click On Map
+          </button>
+
+          <button
+            onClick={() => setOpenUserLocationBookshelf(true)}
+            className="add-new-bookshelf-btn"
+          >
+            User Location
+          </button>
+
+          <button
+            onClick={() => setOpenSearchLocationBookshelf(true)}
+            className="add-new-bookshelf-btn"
+          >
+            Search Location
+          </button>
+        </div>
       </aside>
       <DataGrid
         // Rows
@@ -148,8 +169,21 @@ const AllBookshelves = () => {
         </article>
       )}
 
-      {openBookshelf && <BookshelfForm setOpenBookshelf={setOpenBookshelf} />}
-   
+      {openClickMapBookshelf && (
+        <ClickOnMapBookshelf
+          setOpenClickMapBookshelf={setOpenClickMapBookshelf}
+        />
+      )}
+      {openUserLocationBookshelf && (
+        <UserLocationBookshelf
+          setOpenUserLocationBookshelf={setOpenUserLocationBookshelf}
+        />
+      )}
+      {openSearchLocationBookshelf && (
+        <SearchLocationBookshelf
+          setOpenSearchLocationBookshelf={setOpenSearchLocationBookshelf}
+        />
+      )}
     </section>
   );
 };
