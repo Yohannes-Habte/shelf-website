@@ -2,6 +2,7 @@ import express from "express";
 import {
   createBookshelf,
   deleteBookshelf,
+  getAllBooksInBookshelf,
   getBookshelf,
   getBookshelves,
   updateBookshelf,
@@ -14,5 +15,6 @@ bookshelfRouter.get("/", getBookshelves);
 bookshelfRouter.get("/:id", getBookshelf);
 bookshelfRouter.put("/:id", updateBookshelf);
 bookshelfRouter.delete("/:id", deleteBookshelf);
+bookshelfRouter.get("/:id/books", getAllBooksInBookshelf);
 
 export default bookshelfRouter;

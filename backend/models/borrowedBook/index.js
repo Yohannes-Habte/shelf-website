@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 // Define the BorrowedBook schema
 const borrowedBookSchema = new Schema(
   {
-    ISBN: { type: String, required: true, unique: true },
     book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
     title: { type: String, required: true },
     author: { type: String, required: true },

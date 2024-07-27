@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  bookshelf: null,
+  shelf: null,
   bookshelves: [],
   count: null,
   loading: false,
@@ -25,7 +25,7 @@ const bookshelfSlice = createSlice({
     // Post single bookshelf
     postBookshelfStart: setLoading,
     postBookshelfSuccess: (state, action) => {
-      state.bookshelf = action.payload;
+      state.shelf = action.payload;
       state.loading = false;
     },
     postBookshelfFailure: setError,
@@ -33,7 +33,7 @@ const bookshelfSlice = createSlice({
     // Fetch single bookshelf
     fetchBookshelfStart: setLoading,
     fetchBookshelfSuccess: (state, action) => {
-      state.bookshelf = action.payload;
+      state.shelf = action.payload;
       state.loading = false;
     },
     fetchBookshelfFailure: setError,
@@ -49,7 +49,7 @@ const bookshelfSlice = createSlice({
     // Update bookshelf
     updateBookshelfStart: setLoading,
     updateBookshelfSuccess: (state, action) => {
-      state.bookshelf = action.payload;
+      state.shelf = action.payload;
       state.loading = false;
     },
     updateBookshelfFailure: setError,
@@ -57,7 +57,7 @@ const bookshelfSlice = createSlice({
     // Delete single bookshelf
     deleteBookshelfStart: setLoading,
     deleteBookshelfSuccess: (state) => {
-      state.bookshelf = null;
+      state.shelf = null;
       state.loading = false;
     },
     deleteBookshelfFailure: setError,

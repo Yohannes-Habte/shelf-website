@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
 const initialValues = {
-  ISBN: "",
   title: "",
   author: "",
   dueDate: "",
@@ -102,22 +101,6 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
 
         <form onSubmit={handleSubmit} className="borrowed-book-form">
           <div className="input-containers-wrapper">
-            {/* Book ISBN */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <input
-                type="text"
-                name="ISBN"
-                value={formData.ISBN}
-                onChange={handleChange}
-                placeholder="Book ISBN"
-                className="input-field"
-              />
-              <label htmlFor="ISBN" className="input-label">
-                Book ISBN
-              </label>
-              <span className="input-highlight"></span>
-            </div>
 
             {/* Book */}
             <div className="input-container">

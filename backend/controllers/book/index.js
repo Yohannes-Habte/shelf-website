@@ -18,28 +18,13 @@ export const createBook = async (req, res, next) => {
     shelfId,
   } = req.body;
 
-  if (
-    !ISBN ||
-    !title ||
-    !genre ||
-    !publishedDate ||
-    !language ||
-    !publisher ||
-    !coverImageUrl ||
-    !shelfId
-  ) {
+  if (!title || !genre || !language || !shelfId) {
     return res
       .status(400)
       .json({ message: "All required fields must be provided" });
   }
 
   try {
-    const book = await Book.findOne({ ISBN });
-
-    if (book) {
-      return next(createError(400, "Book already exist!"));
-    }
-
     const newBook = new Book({
       ISBN,
       title,
@@ -114,9 +99,66 @@ export const updateBook = async (req, res, next) => {
 //==========================================================================
 export const getBooks = async (req, res, next) => {
   try {
-    const books = await Book.find();
+    const { title, genre, ISBN, language } = req.query;
+    const filter = {};
 
-    if (!books) {
+    if (title) {
+      filter.title = { $regex: title, $options: "i" }; // Case-insensitive regex search
+    }
+    if (genre) {
+      filter.genre = genre;
+    }
+    if (ISBN) {
+      filter.ISBN = ISBN;
+    }
+    if (language) {
+      filter.language = language;
+    }
+
+    const books = await Book.find(filter);
+
+    if (books.length === 0) {
+      return next(createError(404, "No books found!"));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: books,
+    });
+  } catch (error) {
+    return next(createError(500, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
+// Second option to all books
+//==========================================================================
+export const getAllBooks = async (req, res, next) => {
+  try {
+    const { title, genre, ISBN, language } = req.query;
+    const filters = [];
+
+    if (title) {
+      filters.push({ title: { $regex: title, $options: "i" } }); // Case-insensitive regex search
+    }
+    if (genre) {
+      filters.push({ genre });
+    }
+    if (ISBN) {
+      filters.push({ ISBN });
+    }
+    if (language) {
+      filters.push({ language });
+    }
+
+    let books;
+    if (filters.length > 0) {
+      books = await Book.find({ $or: filters });
+    } else {
+      books = await Book.find();
+    }
+
+    if (!books.length) {
       return next(createError(400, "Books not found!"));
     }
 
@@ -170,5 +212,29 @@ export const deleteBook = async (req, res, next) => {
     });
   } catch (error) {
     return next(createError(400, "Server error! Please try again!"));
+  }
+};
+
+//==========================================================================
+// Count all books
+//==========================================================================
+
+export const countBooks = async (req, res, next) => {
+  try {
+    const count = await Book.countDocuments({});
+
+    if (count === 0) {
+      return next(createError(404, "No books found."));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: count,
+    });
+  } catch (error) {
+    console.error("Error counting books:", error);
+    return next(
+      createError(500, "Failed to count books. Please try again later.")
+    );
   }
 };

@@ -22,23 +22,23 @@ import { v4 as uuidv4 } from "uuid";
 //   } = req.body;
 
 //   try {
-//     // Generate a unique barcode
+// Generate a unique barcode
 //     const barcode = uuidv4();
-//     /*
-//     Other methods to generate unique barcode:
-//     1. mongoose object id
-//         const barcode = new mongoose.Types.ObjectId().toString();
-//     2. nanoid
-//         npm install nanoid
-//         import { nanoid } from 'nanoid';
-//         const barcode = nanoid();
+/*
+    Other methods to generate unique barcode:
+    1. mongoose object id
+        const barcode = new mongoose.Types.ObjectId().toString();
+    2. nanoid
+        npm install nanoid
+        import { nanoid } from 'nanoid';
+        const barcode = nanoid();
 
-//     3. Custom Barcode Generation
-//         const generateBarcode = () => {
-//         return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-//         }
-//          const barcode = generateBarcode();
-//     */
+    3. Custom Barcode Generation
+        const generateBarcode = () => {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+         const barcode = generateBarcode();
+    */
 
 //     // Check if the bookshelf already exists
 //     const existingBookshelf = await Bookshelf.findOne({ barcode });
@@ -227,10 +227,10 @@ export const getBookshelves = async (req, res, next) => {
       // If search parameter is provided, construct the query with $or conditions
       query = {
         $or: [
-          { name: new RegExp(search, 'i') },
-          { country: new RegExp(search, 'i') },
-          { state: new RegExp(search, 'i') },
-          { city: new RegExp(search, 'i') },
+          { name: new RegExp(search, "i") },
+          { country: new RegExp(search, "i") },
+          { state: new RegExp(search, "i") },
+          { city: new RegExp(search, "i") },
         ],
       };
     }
@@ -301,14 +301,14 @@ export const deleteBookshelf = async (req, res, next) => {
 // Get single bookshelf books
 //==========================================================================
 export const getAllBooksInBookshelf = async (req, res, next) => {
-  const { bookshelfId } = req.params;
+  const bookshelfId = req.params.id;
 
   try {
     // Find the bookshelf by its ID and populate the books, donatedBooks, and borrowedBooks fields
     const bookshelf = await Bookshelf.findById(bookshelfId)
-      .populate("books._id", "title author") // Adjust the fields as necessary
-      .populate("donatedBooks._id", "title author")
-      .populate("borrowedBooks._id", "title author");
+      .populate({ path: 'books', select: 'title' })
+      .populate({ path: 'donatedBooks', select: 'title' })
+      .populate({ path: 'borrowedBooks', select: 'title' });
 
     if (!bookshelf) {
       return next(createError(400, "Bookshelf not found!"));
@@ -324,6 +324,7 @@ export const getAllBooksInBookshelf = async (req, res, next) => {
       borrowedBooks,
     });
   } catch (error) {
+    console.error(error);
     return next(createError(400, "Server error! Please try again!"));
   }
 };

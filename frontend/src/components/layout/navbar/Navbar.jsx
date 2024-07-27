@@ -29,20 +29,8 @@ const Navbar = () => {
         </li>
 
         <li className="navbar-item">
-          <NavLink to={"/about"} className={navbarNavLink}>
-            About
-          </NavLink>
-        </li>
-
-        <li className="navbar-item">
           <NavLink to={"/bookshelves"} className={navbarNavLink}>
             Bookshelves
-          </NavLink>
-        </li>
-
-        <li className="navbar-item">
-          <NavLink to={"/FAQs"} className={navbarNavLink}>
-            FAQ
           </NavLink>
         </li>
 

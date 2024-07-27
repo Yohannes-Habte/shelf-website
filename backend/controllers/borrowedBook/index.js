@@ -9,7 +9,6 @@ import Bookshelf from "../../models/bookshelf/index.js";
 //==========================================================================
 export const createBorrowedBook = async (req, res, next) => {
   const {
-    ISBN,
     title,
     author,
     dueDate,
@@ -35,7 +34,6 @@ export const createBorrowedBook = async (req, res, next) => {
     }
 
     const borrowedBook = new BorrowedBook({
-      ISBN: ISBN,
       title: title,
       author: author,
       dueDate: dueDate,

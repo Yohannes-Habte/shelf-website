@@ -19,12 +19,13 @@ import {
   countBookshelvesSuccess,
   countBookshelvesFailure,
 } from "../../reducers/bookshelf/bookshelfReducer";
+import { API } from "../../../utils/security/secreteKey";
 
 // Post a new bookshelf
 export const postBookshelf = (bookshelfData) => async (dispatch) => {
   dispatch(postBookshelfStart());
   try {
-    const response = await axios.post("/api/bookshelves", bookshelfData);
+    const response = await axios.post(`${API}/bookshelves/new`, bookshelfData);
     dispatch(postBookshelfSuccess(response.data));
   } catch (error) {
     dispatch(postBookshelfFailure(error.message));
@@ -35,8 +36,8 @@ export const postBookshelf = (bookshelfData) => async (dispatch) => {
 export const fetchBookshelf = (id) => async (dispatch) => {
   dispatch(fetchBookshelfStart());
   try {
-    const response = await axios.get(`/api/bookshelves/${id}`);
-    dispatch(fetchBookshelfSuccess(response.data));
+    const {data} = await axios.get(`${API}/bookshelves/${id}`);
+    dispatch(fetchBookshelfSuccess(data.result));
   } catch (error) {
     dispatch(fetchBookshelfFailure(error.message));
   }
@@ -46,8 +47,8 @@ export const fetchBookshelf = (id) => async (dispatch) => {
 export const fetchAllBookshelves = () => async (dispatch) => {
   dispatch(fetchAllBookshelvesStart());
   try {
-    const response = await axios.get("/api/bookshelves");
-    dispatch(fetchAllBookshelvesSuccess(response.data));
+    const {data} = await axios.get(`${API}/bookshelves`);
+    dispatch(fetchAllBookshelvesSuccess(data.result));
   } catch (error) {
     dispatch(fetchAllBookshelvesFailure(error.message));
   }
@@ -57,7 +58,7 @@ export const fetchAllBookshelves = () => async (dispatch) => {
 export const updateBookshelf = (id, updatedData) => async (dispatch) => {
   dispatch(updateBookshelfStart());
   try {
-    const response = await axios.put(`/api/bookshelves/${id}`, updatedData);
+    const response = await axios.put(`${API}/bookshelves/${id}`, updatedData);
     dispatch(updateBookshelfSuccess(response.data));
   } catch (error) {
     dispatch(updateBookshelfFailure(error.message));
@@ -68,7 +69,7 @@ export const updateBookshelf = (id, updatedData) => async (dispatch) => {
 export const deleteBookshelf = (id) => async (dispatch) => {
   dispatch(deleteBookshelfStart());
   try {
-    await axios.delete(`/api/bookshelves/${id}`);
+    await axios.delete(`${API}/bookshelves/${id}`);
     dispatch(deleteBookshelfSuccess());
   } catch (error) {
     dispatch(deleteBookshelfFailure(error.message));
@@ -79,7 +80,7 @@ export const deleteBookshelf = (id) => async (dispatch) => {
 export const countBookshelves = () => async (dispatch) => {
   dispatch(countBookshelvesStart());
   try {
-    const response = await axios.get("/api/bookshelves/count");
+    const response = await axios.get(`${API}/bookshelves/count`);
     dispatch(countBookshelvesSuccess(response.data));
   } catch (error) {
     dispatch(countBookshelvesFailure(error.message));

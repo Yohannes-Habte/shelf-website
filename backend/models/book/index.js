@@ -4,14 +4,15 @@ const Schema = mongoose.Schema;
 // Define the Book Schema
 const bookSchema = new Schema(
   {
-    ISBN: { type: String, required: true, unique: true },
+   
     title: { type: String, required: true },
     genre: { type: mongoose.Types.ObjectId, ref: "Genre", required: true },
-    publishedDate: { type: Date },
     language: { type: String, required: true },
-    publisher: { type: String, required: true },
+    publishedDate: { type: Date },
+    publisher: { type: String },
     coverImageUrl: { type: String },
     summary: { type: String },
+    ISBN: { type: String },
 
     authors: [
       {

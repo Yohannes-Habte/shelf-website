@@ -1,0 +1,19 @@
+@import "../../../styles/Mixins.scss";
+@import "../../../styles/Variables.scss";
+
+.bookshelves-page {
+  .bookshelves-page-container {
+    width: $desktop;
+    margin: 1rem auto;
+
+    .bookshelves-page-title {
+      @include title;
+    }
+
+    .bookshelf-cards-wrapper {
+      @include twoGridTemplateEqualColumns;
+      column-gap: 2rem;
+      row-gap: 2rem;
+    }
+  }
+}
