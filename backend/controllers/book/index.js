@@ -1,6 +1,7 @@
 import Book from "../../models/book/index.js";
 import createError from "http-errors";
 import Bookshelf from "../../models/bookshelf/index.js";
+import mongoose from "mongoose";
 
 //==========================================================================
 // Create New book
@@ -38,7 +39,6 @@ export const createBook = async (req, res, next) => {
     });
 
     const savedBook = await newBook.save();
-    console.log("save book=", savedBook);
 
     const bookshelf = await Bookshelf.findById(shelfId);
     if (!bookshelf) {
@@ -177,10 +177,17 @@ export const getAllBooks = async (req, res, next) => {
 export const getBook = async (req, res, next) => {
   const bookId = req.params.id;
 
+  // Validate the bookId format
+  if (!mongoose.Types.ObjectId.isValid(bookId)) {
+    console.error("Invalid book ID format");
+    return next(createError(400, "Invalid book ID format"));
+  }
+
   try {
     const book = await Book.findById(bookId);
 
     if (!book) {
+      console.error("Book does not exist in database");
       return next(createError(400, "Book does not exist!"));
     }
 
@@ -236,5 +243,33 @@ export const countBooks = async (req, res, next) => {
     return next(
       createError(500, "Failed to count books. Please try again later.")
     );
+  }
+};
+
+//==========================================================================
+// Update book rating
+//==========================================================================
+
+export const updateBookRating = async (req, res, next) => {
+  const { bookId } = req.params;
+  const { rating } = req.body;
+  console.log("rating=", rating);
+
+  try {
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    book.ratings = rating; // Update the book's rating
+    await book.save();
+
+    res.status(200).json({
+      success: true,
+      book,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };

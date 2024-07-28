@@ -8,6 +8,7 @@ import { API } from "../../../utils/security/secreteKey";
 import { toast } from "react-toastify";
 import { UserLocationContext } from "../../../context/userLocation/UserLocationProvider";
 import LikeComponent from "../../LikeComponent/LikeComponent";
+import { Link } from "react-router-dom";
 
 const Bookshelves = () => {
   // Global state variables
@@ -46,7 +47,7 @@ const Bookshelves = () => {
         setCenter={setCenter}
       /> */}
       <div className="flex flex-col md:w-5/12">
-        {bookshelves.map((shelf, ) => (
+        {bookshelves.map((shelf) => (
           <div
             key={shelf._id}
             className="mb-3 border border-gray-300 rounded-lg bg-gray-50 hover:shadow-md cursor-pointer"
@@ -71,7 +72,11 @@ const Bookshelves = () => {
                 </div>
                 <div className="pb-2 flex justify-between">
                   <div className="px-2 py-1 hover:bg-gray-200 rounded flex items-center gap-1 text-sm">
-                    <IoMdBook /> <span>72 Books</span>
+                    <IoMdBook />{" "}
+                    <Link to={`/bookshelves/${shelf._id}/books`}>
+                      {" "}
+                      {bookshelves.length}{" "}
+                    </Link>{" "}
                   </div>
                   <div className="px-2 py-1 hover:bg-gray-200 rounded flex items-center gap-1 text-sm">
                     <FaRegClock /> <span>24 hours</span>

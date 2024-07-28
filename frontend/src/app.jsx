@@ -21,11 +21,11 @@ const App = () => {
 
         <Route path="bookshelves">
           <Route index element={<BookshelvesPage />} />
-          <Route path=":id">
+          <Route path=":bookshelfId">
             <Route index element={<BookshelfPage />} />
             <Route path="books">
               <Route index element={<BooksPage />} />
-              <Route path=":id" element={<BookPage />} />
+              <Route path=":bookId" element={<BookPage />} />
             </Route>
           </Route>
         </Route>

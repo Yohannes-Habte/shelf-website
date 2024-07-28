@@ -1,3 +1,4 @@
+import Book from "../../models/book/index.js";
 import Rating from "../../models/ratings/index.js";
 import createError from "http-errors";
 
@@ -5,23 +6,25 @@ import createError from "http-errors";
 // Create New rating
 //==========================================================================
 export const createRating = async (req, res, next) => {
-  try {
-    const newRating = new Rating(req.body);
+  const { bookId } = req.params;
+  const { rating } = req.body;
 
-    try {
-      await newRating.save();
-    } catch (error) {
-      console.log(error);
-      return next(createError(500, "Rating not saved"));
+  try {
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
     }
 
-    res.status(201).json({
+    book.ratings = rating; // Update the book's rating
+    await book.save();
+
+    res.status(200).json({
       success: true,
-      message: "Rating successfully created!",
+      book,
     });
   } catch (error) {
-    console.log(error);
-    return next(createError(500, "Server error! please try again!"));
+    console.error(error);
+    next(error);
   }
 };
 

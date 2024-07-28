@@ -305,10 +305,22 @@ export const getAllBooksInBookshelf = async (req, res, next) => {
 
   try {
     // Find the bookshelf by its ID and populate the books, donatedBooks, and borrowedBooks fields
-    const bookshelf = await Bookshelf.findById(bookshelfId)
-      .populate({ path: 'books', select: 'title' })
-      .populate({ path: 'donatedBooks', select: 'title' })
-      .populate({ path: 'borrowedBooks', select: 'title' });
+    // const bookshelf = await Bookshelf.findById(bookshelfId)
+    //   .populate({ path: 'books', select: 'title' })
+    //   .populate({ path: 'donatedBooks', select: 'title' })
+    //   .populate({ path: 'borrowedBooks', select: 'title' });
+
+    /*
+    
+    To populate all the attributes of the Book schema in the getAllBooksInBookshelf function, you need to update the populate method calls to not limit the fields being selected. Instead, you will populate the full Book documents.
+    
+    */
+
+     // Find the bookshelf by its ID and populate the books, donatedBooks, and borrowedBooks fields
+     const bookshelf = await Bookshelf.findById(bookshelfId)
+     .populate({ path: 'books', model: 'Book' })
+     .populate({ path: 'donatedBooks', model: 'Book' })
+     .populate({ path: 'borrowedBooks', model: 'Book' });
 
     if (!bookshelf) {
       return next(createError(400, "Bookshelf not found!"));
