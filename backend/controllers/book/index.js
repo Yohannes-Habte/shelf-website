@@ -103,7 +103,7 @@ export const getBooks = async (req, res, next) => {
     const filter = {};
 
     if (title) {
-      filter.title = { $regex: title, $options: "i" }; // Case-insensitive regex search
+      filter.title = { $regex: title, $options: "i" };
     }
     if (genre) {
       filter.genre = genre;
@@ -139,7 +139,7 @@ export const getAllBooks = async (req, res, next) => {
     const filters = [];
 
     if (title) {
-      filters.push({ title: { $regex: title, $options: "i" } }); // Case-insensitive regex search
+      filters.push({ title: { $regex: title, $options: "i" } });
     }
     if (genre) {
       filters.push({ genre });
@@ -153,9 +153,15 @@ export const getAllBooks = async (req, res, next) => {
 
     let books;
     if (filters.length > 0) {
-      books = await Book.find({ $or: filters });
+      books = await Book.find({ $or: filters }).populate({
+        path: "genre",
+        select: "category",
+      });
     } else {
-      books = await Book.find();
+      books = await Book.find().populate({
+        path: "genre",
+        select: "category",
+      });
     }
 
     if (!books.length) {

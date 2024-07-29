@@ -2,90 +2,103 @@ import DonatedBook from "../../models/donatedBook/index.js";
 import createError from "http-errors";
 import User from "../../models/user/index.js";
 import Bookshelf from "../../models/bookshelf/index.js";
+import mongoose from "mongoose";
 
 //==========================================================================
 // Create New Borrowed book
 //==========================================================================
-export const createDonatedBook = async (req, res, next) => {
-  const { title, author, ISBN, message, bookshelfId, userId } = req.body;
 
-  // Log incoming request data
-  console.log("Incoming request data:", req.body);
+export const createDonatedBook = async (req, res, next) => {
+  const { title, author, bookshelfId, userId } = req.body;
 
   try {
-    if (!title || !author || !ISBN || !userId || !bookshelfId) {
+    if (!title || !author || !userId || !bookshelfId) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Check if the user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
+    // Check if the bookshelf exists
     const bookshelf = await Bookshelf.findById(bookshelfId);
     if (!bookshelf) {
       return res.status(400).json({ message: "Bookshelf not found" });
     }
 
-    const book = await DonatedBook.findOne({ ISBN });
-
-    if (book) {
-      return next(createError(400, "Book already donated!"));
-    }
-
+    // Create a new donated book
     const newDonatedBook = new DonatedBook({
       title,
       author,
-      ISBN,
-      message,
+      bookshelfId,
+      userId,
+      // Add other required fields here
     });
 
-    try {
-      await newDonatedBook.save();
-    } catch (error) {
-      console.log(error);
-      return next(createError(500, "Donated book not saved!"));
-    }
+    // Save the new donated book
+    await newDonatedBook.save();
 
+    // Update the User's donatedBooks
     await User.findByIdAndUpdate(
       userId,
       { $push: { donatedBooks: newDonatedBook._id } },
       { new: true, runValidators: true }
     );
 
+    // Update the Bookshelf's donatedBooks
     await Bookshelf.findByIdAndUpdate(
       bookshelfId,
       { $push: { donatedBooks: newDonatedBook._id } },
       { new: true, runValidators: true }
     );
 
+    // Respond with success
     res.status(201).json({
       success: true,
       message: "Donated book created successfully",
     });
   } catch (error) {
-    console.log(error);
-    return next(createError(500, "Server error! please try again!"));
+    console.error(error); // Log the error for debugging
+    return next(createError(500, "Server error! Please try again."));
   }
 };
 
 //==========================================================================
 // Get all donated books
 //==========================================================================
+
 export const getDonatedBooks = async (req, res, next) => {
   try {
-    const books = await DonatedBook.find();
+    // Retrieve all donated books and populate relevant fields
+    const books = await DonatedBook.find()
+      .populate({ path: "genre", select: "category" }) // Populate the genre field
+      .populate({ path: "book", model: "Book" }) // Populate the 'book' reference
+      .populate({ path: "borrowedFrom", model: "Bookshelf" }); // Populate the 'borrowedFrom' reference
 
-    if (!books) {
-      return next(createError(400, "Donated books not found!"));
+    // Check if no books are found
+    if (books.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No donated books found.",
+        result: [],
+      });
     }
 
+    // Send successful response with books
     return res.status(200).json({
       success: true,
       result: books,
     });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    // Log the error for debugging
+    console.error("Error fetching donated books:", error);
+
+    // Send error response
+    return next(
+      createError(500, "Internal Server Error. Please try again later.")
+    );
   }
 };
 
@@ -95,23 +108,103 @@ export const getDonatedBooks = async (req, res, next) => {
 export const getDonatedBook = async (req, res, next) => {
   const donatedBookId = req.params.id;
 
-  if (!mongoose.Types.ObjectId.isValid(donatedBookId)) {
-    return res.status(400).json({ message: "Invalid donated book ID" });
+  if (!donatedBookId || !mongoose.Types.ObjectId.isValid(donatedBookId)) {
+    return next(createError(400, "Invalid donated book ID."));
   }
 
   try {
-    const book = await DonatedBook.findById(donatedBookId);
-
-    if (!book) {
-      return next(createError(400, "Donated Book does not exist!"));
+    const books = await DonatedBook.findById(donatedBookId);
+    if (!books) {
+      return next(createError(404, "Donated books not found."));
     }
 
     return res.status(200).json({
       success: true,
-      result: book,
+      result: books,
     });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    console.error("Error fetching donated books:", error);
+    return next(
+      createError(500, "Internal Server Error. Please try again later.")
+    );
+  }
+};
+//==========================================================================
+// Update a donated book
+//==========================================================================
+
+export const updateDonatedBook = async (req, res, next) => {
+  const donatedBookId = req.params.id;
+  const { bookshelfId, userId, ...updateData } = req.body;
+
+  if (!donatedBookId || !mongoose.Types.ObjectId.isValid(donatedBookId)) {
+    return next(createError(400, "Invalid donated book ID."));
+  }
+
+  // Validate and sanitize incoming data
+  if (
+    updateData.coverImageUrl !== undefined &&
+    typeof updateData.coverImageUrl !== "string"
+  ) {
+    return next(createError(400, "Invalid coverImageUrl."));
+  }
+
+  try {
+    // Fetch the existing book to ensure it exists
+    const existingBook = await DonatedBook.findById(donatedBookId);
+    if (!existingBook) {
+      return next(createError(404, "Donated book not found."));
+    }
+
+    // Update the book with new data
+    const updatedBook = await DonatedBook.findByIdAndUpdate(
+      donatedBookId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBook) {
+      return next(createError(404, "Donated book not updated."));
+    }
+
+    // Handle Bookshelf update if bookshelfId is provided
+    if (bookshelfId && mongoose.Types.ObjectId.isValid(bookshelfId)) {
+      // Add the book to the new bookshelf
+      const newBookshelf = await Bookshelf.findByIdAndUpdate(
+        bookshelfId,
+        { $push: { donatedBooks: donatedBookId } },
+        { new: true }
+      );
+
+      if (!newBookshelf) {
+        return next(createError(400, "New bookshelf not found."));
+      }
+    }
+
+    // Handle User update if userId is provided
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      // Add the book to the new user
+      const newUser = await User.findByIdAndUpdate(
+        userId,
+        { $push: { donatedBooks: donatedBookId } },
+        { new: true }
+      );
+
+      if (!newUser) {
+        return next(createError(400, "New user not found."));
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: updatedBook,
+      message: "Donated book successfully updated",
+    });
+  } catch (error) {
+    console.error("Error updating donated book:", error);
+    return next(
+      createError(500, "Internal Server Error. Please try again later.")
+    );
   }
 };
 
@@ -125,7 +218,7 @@ export const deleteBorrowedBook = async (req, res) => {
     return res.status(400).json({ message: "Invalid donated book ID" });
   }
 
-  if (req.user.role !== "generalManager") {
+  if (req.user.role !== "admin") {
     return res
       .status(403)
       .json({ message: "Forbidden: to delete donated book" });
@@ -187,6 +280,15 @@ export const deleteBorrowedBook = async (req, res) => {
 export const countDonatedBooks = async (req, res, next) => {
   try {
     const counts = await DonatedBook.countDocuments();
+
+    if (counts < 0) {
+      return next(createError(500, "Invalid count of donated books."));
+    }
+
+    if (counts === 0) {
+      return next(createError(500, "No donated books found."));
+    }
+
     return res.status(200).json({
       success: true,
       result: counts,

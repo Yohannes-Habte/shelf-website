@@ -160,7 +160,6 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
                 value={formData.author}
                 onChange={handleChange}
                 className="input-field"
-                required
               >
                 <option value="">Select Author</option>
                 {authors &&

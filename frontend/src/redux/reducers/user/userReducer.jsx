@@ -5,6 +5,8 @@ const initialState = {
     ? JSON.parse(localStorage.getItem("user"))
     : null,
   users: [],
+  borrowedBooks: [],
+  donatedBooks: [],
   count: null,
   loading: false,
   error: null,
@@ -98,6 +100,22 @@ const userSlice = createSlice({
     },
     countUsersFailure: setError,
 
+    // Fetch Borrowed Books
+    fetchBorrowedBooksStart: setLoading,
+    fetchBorrowedBooksSuccess: (state, action) => {
+      state.borrowedBooks = action.payload;
+      state.loading = false;
+    },
+    fetchBorrowedBooksFailure: setError,
+
+    // Fetch Donated Books
+    fetchDonatedBooksStart: setLoading,
+    fetchDonatedBooksSuccess: (state, action) => {
+      state.donatedBooks = action.payload;
+      state.loading = false;
+    },
+    fetchDonatedBooksFailure: setError,
+
     // Clear Errors
     clearErrors: (state) => {
       state.error = null;
@@ -141,6 +159,15 @@ export const {
   countUsersStart,
   countUsersSuccess,
   countUsersFailure,
+
+  fetchBorrowedBooksStart,
+  fetchBorrowedBooksSuccess,
+  fetchBorrowedBooksFailure,
+
+  fetchDonatedBooksStart,
+  fetchDonatedBooksSuccess,
+  fetchDonatedBooksFailure,
+
   clearErrors,
 } = userSlice.actions;
 

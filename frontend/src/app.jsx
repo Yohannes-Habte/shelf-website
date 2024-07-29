@@ -12,6 +12,7 @@ import UserProfilePage from "./pages/usersPages/userProfilePage/UserProfilePage"
 import AdminDashboardPage from "./pages/dashboardPages/adminDashboardPage/AdminDashboardPage";
 import BookPage from "./pages/booksPages/bookPage/BookPage";
 import BooksPage from "./pages/booksPages/booksPage/BooksPage";
+import DonatedBookPage from "./pages/donatedBooksPages/donatedBookPage/DonatedBookPage";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
           </Route>
         </Route>
 
+        <Route path="/donatedBooks/:bookId" element={<DonatedBookPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />

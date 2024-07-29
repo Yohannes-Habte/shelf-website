@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-// Define the BorrowedBook schema
 const borrowedBookSchema = new Schema(
   {
     book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
@@ -9,24 +8,17 @@ const borrowedBookSchema = new Schema(
     author: { type: String, required: true },
     dateBorrowed: { type: Date, default: Date.now },
     dueDate: { type: Date, required: true },
-
-    borrowedFrom: {
-      type: mongoose.Types.ObjectId,
-      ref: "Bookshelf",
-      required: true,
-    },
-
+    borrowedFrom: { type: mongoose.Types.ObjectId, ref: "Bookshelf", required: true },
     ratings: { type: Number },
     reviews: [
       {
-        user: { type: Object },
+        user: { type: mongoose.Types.ObjectId, ref: "User" },
         rating: { type: Number },
         comment: { type: String },
-        shelfId: { type: String },
-        createdAt: { type: Date, default: Date.now() },
+        shelfId: { type: mongoose.Types.ObjectId, ref: "Bookshelf" },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
-
     status: {
       type: String,
       enum: ["borrowed", "returned", "overdue"],

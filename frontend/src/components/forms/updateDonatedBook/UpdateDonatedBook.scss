@@ -1,0 +1,79 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+.update-donated-book-modal {
+  @include modal;
+
+  .update-donated-book-popup-box {
+    @include popupBox;
+    padding: 2rem;
+
+    .close-modal {
+      @include closeModal;
+    }
+
+    .update-donated-book-form-title {
+      @include subTitle;
+    }
+
+    .update-donated-book-form {
+      @include flexColumn;
+
+      .input-containers-wrapper {
+        @include twoGridTemplateEqualColumns;
+      }
+
+      .input-container {
+        @include inputContainer;
+
+        .input-icon {
+          @include inputIcon;
+        }
+
+        .input-field {
+          color: $black;
+          @include inputField;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+
+        .input-field:focus + .input-label {
+          @include focusInputFieldAndInputLabel;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+      }
+
+      .checkbox-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 1rem;
+        background-color: white;
+
+        .input-icon {
+          color: $green;
+        }
+
+       
+        .checkbox-field {
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+
+      .update-donated-book-form-btn {
+        @include button1;
+      }
+    }
+  }
+}

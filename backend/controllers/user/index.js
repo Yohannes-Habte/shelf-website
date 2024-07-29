@@ -166,3 +166,83 @@ export const getTotalUsersCount = async (req, res, next) => {
     return next(createError(500, "Server error! Please try again!"));
   }
 };
+
+//====================================================================
+// Total user donated books
+//====================================================================
+export const getUserDonatedBooks = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId).populate({
+      path: "donatedBooks._id", // The field in the User model that holds book references
+      model: "Book", // The Book model
+      select: "-__v", // Optionally exclude fields like __v if not needed
+    });
+
+    if (!user) {
+      return next(createError(404, "User not found."));
+    }
+
+    const donatedBooks = user.donatedBooks.map((book) => book._id); // Map to extract book details
+
+    if (!donatedBooks.length) {
+      return next(createError(404, "No donated books found."));
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: donatedBooks, 
+    });
+  } catch (error) {
+    return next(
+      createError(500, "Internal Server Error. Please try again later.")
+    );
+  }
+};
+
+//====================================================================
+// Total user donated books
+//====================================================================
+
+export const getUserBorrowedBooks = async (req, res, next) => {
+  const { userId } = req.params; // Get userId from request parameters
+
+  try {
+ 
+    const user = await User.findById(userId)
+      .populate({
+        path: 'borrowedBooks._id', // Populate the `borrowedBooks` field
+        model: 'BorrowedBook', // Reference the BorrowedBook model
+        select: '-__v', // Optionally exclude fields like __v if not needed
+      });
+
+    
+    // Check if the user exists
+    if (!user) {
+      return next(createError(404, 'User not found.'));
+    }
+
+    // Extract and return the borrowedBooks array
+    const borrowedBooks = user.borrowedBooks.map(borrowedBook => borrowedBook._id);
+
+    console.log("borrowed books=", borrowedBooks)
+
+    if (!borrowedBooks || borrowedBooks.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No borrowed books found.',
+        result: []
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      result: borrowedBooks
+    });
+  } catch (error) {
+    console.error('Error fetching borrowed books:', error);
+    return next(createError(500, 'Internal Server Error. Please try again later.'));
+  }
+};
+

@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-// Define the Book Schema
 const bookSchema = new Schema(
   {
-   
     title: { type: String, required: true },
     genre: { type: mongoose.Types.ObjectId, ref: "Genre", required: true },
     language: { type: String, required: true },
@@ -13,7 +11,7 @@ const bookSchema = new Schema(
     coverImageUrl: { type: String },
     summary: { type: String },
     ISBN: { type: String },
-
+    audio: { type: Boolean, default: false },
     authors: [
       {
         firstName: { type: String, required: true },
@@ -22,32 +20,23 @@ const bookSchema = new Schema(
         deathDate: { type: Date },
       },
     ],
-
-    borrowedTimes: [
-      {
-        _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },
-      },
-    ],
-
+    borrowedTimes: [{ type: mongoose.Types.ObjectId, ref: "BorrowedBook" }],
     status: {
       type: String,
       default: "available",
       enum: ["available", "borrowed"],
     },
-
     ratings: { type: Number },
-
     reviews: [
       {
-        user: { type: Object },
+        user: { type: mongoose.Types.ObjectId, ref: "User" },
         rating: { type: Number },
         comment: { type: String },
-        shelfId: { type: String },
-        createdAt: { type: Date, default: Date.now() },
+        shelfId: { type: mongoose.Types.ObjectId, ref: "Bookshelf" },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
   },
-
   {
     timestamps: true,
   }

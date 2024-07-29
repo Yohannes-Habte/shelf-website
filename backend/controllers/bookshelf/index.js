@@ -73,7 +73,6 @@ import { v4 as uuidv4 } from "uuid";
 //       message: "Bookshelf successfully created!",
 //     });
 //   } catch (error) {
-//     console.error(error);
 //     return next(createError(500, "Server error! Please try again!"));
 //   }
 // };
@@ -150,7 +149,6 @@ export const createBookshelf = async (req, res, next) => {
       message: "Bookshelf successfully created!",
     });
   } catch (error) {
-    console.error(error);
     return next(createError(500, "Server error! Please try again!"));
   }
 };
@@ -209,7 +207,6 @@ export const updateBookshelf = async (req, res, next) => {
       data: updatedBookshelf,
     });
   } catch (error) {
-    console.error(error);
     return next(createError(500, "Server error! Please try again!"));
   }
 };
@@ -336,7 +333,6 @@ export const getAllBooksInBookshelf = async (req, res, next) => {
       borrowedBooks,
     });
   } catch (error) {
-    console.error(error);
     return next(createError(400, "Server error! Please try again!"));
   }
 };
@@ -402,7 +398,7 @@ export const countTotalBooksInBookshelf = async () => {
     ]);
 
     const totalBooks = result.length > 0 ? result[0].totalBooksInAllShelf : 0;
-    console.log(`Total number of books: ${totalBooks}`);
+
 
     res.status(200).json({
       success: true,
@@ -439,7 +435,7 @@ export const calculateTotalAvailableBooks = async () => {
 
     const totalAvailableBooks =
       result.length > 0 ? result[0].bookshelfAvailableBooks : 0;
-    console.log(`Total number of available books: ${totalAvailableBooks}`);
+   
 
     res.status(200).json({
       success: true,

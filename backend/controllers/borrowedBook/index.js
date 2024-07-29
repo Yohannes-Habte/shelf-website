@@ -8,14 +8,7 @@ import Bookshelf from "../../models/bookshelf/index.js";
 // Create New Borrowed book
 //==========================================================================
 export const createBorrowedBook = async (req, res, next) => {
-  const {
-    title,
-    author,
-    dueDate,
-    book: bookId,
-    borrowedFrom: bookshelfId,
-  } = req.body;
-
+  const { title, author, dueDate, book: bookId, borrowedFrom: bookshelfId } = req.body;
   const userId = req.params.id;
 
   try {
@@ -23,35 +16,31 @@ export const createBorrowedBook = async (req, res, next) => {
     const book = await Book.findById(bookId);
     const bookshelf = await Bookshelf.findById(bookshelfId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
-    if (!bookshelf) {
-      return res.status(404).json({ message: "Bookshelf not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!book) return res.status(404).json({ message: "Book not found" });
+    if (!bookshelf) return res.status(404).json({ message: "Bookshelf not found" });
 
     const borrowedBook = new BorrowedBook({
-      title: title,
-      author: author,
-      dueDate: dueDate,
+      title,
+      author,
+      dueDate,
       book: bookId,
       borrowedFrom: bookshelfId,
     });
 
-    await borrowedBook.save();
+    const savedBorrowedBook = await borrowedBook.save();
 
-    user.borrowedBooks.push(borrowedBook._id);
+    user.borrowedBooks = user.borrowedBooks || [];
+    user.borrowedBooks.push(savedBorrowedBook._id);
     await user.save();
 
-    bookshelf.borrowedBooks.push(borrowedBook._id);
-    await bookshelf.save();
-
-    book.status = "borrowed";
-    book.borrowedTimes.push(borrowedBook._id);
+    book.borrowedTimes = book.borrowedTimes || [];
+    book.borrowedTimes.push(savedBorrowedBook._id);
     await book.save();
+
+    bookshelf.borrowedBooks = bookshelf.borrowedBooks || [];
+    bookshelf.borrowedBooks.push(savedBorrowedBook._id);
+    await bookshelf.save();
 
     res.status(201).json({
       success: true,
@@ -60,30 +49,49 @@ export const createBorrowedBook = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error creating borrowed book:", error);
-    next(error);
+    res.status(500).json({
+      message: "Internal Server Error. Please try again later.",
+      error: error.message,
+    });
   }
 };
+
 
 //==========================================================================
 // Get all books
 //==========================================================================
-export const getBorrowedBooks = async (req, res, next) => {
-  try {
-    const books = await BorrowedBook.find();
 
-    if (!books) {
-      return next(createError(400, "Borrowed books not found!"));
+export const getBorrowedBooks = async (req, res, next) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId).populate("borrowedBooks");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({
-      success: true,
-      result: books,
-    });
+    if (!user.borrowedBooks || user.borrowedBooks.length === 0) {
+      return res.status(200).json({ borrowedBooks: [] });
+    }
+
+    const borrowedBooks = user.borrowedBooks.map((borrowedBook) => ({
+      title: borrowedBook.title,
+      author: borrowedBook.author,
+      dueDate: borrowedBook.dueDate,
+      bookId: borrowedBook.book,
+      borrowedFrom: borrowedBook.borrowedFrom,
+    }));
+
+    res.status(200).json({ borrowedBooks });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    console.error("Error fetching borrowed books:", error);
+    res.status(500).json({
+      message: "Internal Server Error. Please try again later.",
+      error: error.message,
+    });
   }
 };
-
 //==========================================================================
 // Get single book
 //==========================================================================

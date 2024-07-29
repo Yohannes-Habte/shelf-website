@@ -20,30 +20,14 @@ const userSchema = new Schema(
     city: { type: String },
     state: { type: String },
     country: { type: String },
-
-    borrowedBooks: [
-      {
-        _id: { type: mongoose.Types.ObjectId, ref: "BorrowedBook" },
-      },
-
-      {
-        _id: { type: mongoose.Types.ObjectId, ref: "Bookshelf" },
-      },
-    ],
-
-    donatedBooks: [
-      { _id: { type: mongoose.Types.ObjectId, ref: "Book" } },
-      { _id: { type: mongoose.Types.ObjectId, ref: "Bookshelf" } },
-    ],
-
-    comments: [{ _id: { type: mongoose.Types.ObjectId, ref: "Comment" } }],
-
+    borrowedBooks: [{ type: mongoose.Types.ObjectId, ref: "BorrowedBook" }],
+    donatedBooks: [{ type: mongoose.Types.ObjectId, ref: "DonatedBook" }],
+    comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
     role: {
       type: String,
       default: "user",
       enum: ["user", "financeManager", "admin"],
     },
-
     agree: { type: Boolean, required: true },
   },
   {

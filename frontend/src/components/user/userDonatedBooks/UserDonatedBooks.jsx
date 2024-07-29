@@ -1,61 +1,74 @@
 import "./UserDonatedBooks.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import axios from "axios";
-import { API } from "../../../utils/security/secreteKey";
-import { toast } from "react-toastify";
-import { FaTrashAlt } from "react-icons/fa";
 import DonatedBookForm from "../../forms/DonatedBook/DonatedBookForm";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDonatedBooks } from "../../../redux/actions/user/userActions";
 
 const UserDonatedBooks = () => {
-  const [bookId, setBookId] = useState("");
-  const [confirmDeletion, setConfirmDeletion] = useState(false);
+  // Global state variables
+  const dispatch = useDispatch();
+  const { donatedBooks, currentUser, loading, error } = useSelector(
+    (state) => state.user
+  );
+
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(fetchDonatedBooks(currentUser._id));
+    }
+  }, [dispatch, currentUser]);
+
   const [openDonatedBook, setOpenDonatedBook] = useState(false);
 
   const columns = [
-    { field: "eventName", headerName: "Event Name", width: 250 },
-    { field: "eventPurpose", headerName: "Event PUrpose", width: 400 },
-    { field: "eventOrganizer", headerName: "Event Organizer", width: 150 },
-    { field: "eventFacilitator", headerName: "Event Facilitator", width: 150 },
-    { field: "eventAddress", headerName: "Event Address", width: 200 },
-    { field: "eventDate", headerName: "Event Date", width: 150 },
     {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      renderCell: (params) => {
-        return (
-          <div className="action-wrapper">
-            <FaTrashAlt
-              onClick={() => setBookId(params.id) || setConfirmDeletion(true)}
-              className="delete"
-            />
-          </div>
-        );
-      },
+      field: "coverImageUrl",
+      headerName: "Cover",
+      width: 70,
+      renderCell: (params) => (
+        <img
+          src={params.value}
+          alt={params.row.title}
+          style={{ width: "3rem", height: "2rem", objectFit: "contain" }}
+        />
+      ),
     },
+    { field: "title", headerName: "Title", width: 350 },
+    { field: "author", headerName: "Author", width: 300 },
+    { field: "language", headerName: "Language", width: 150 },
+    { field: "genre", headerName: "Genre", width: 150 },
+    { field: "publishedDate", headerName: "Published Date", width: 150 },
+    { field: "publisher", headerName: "Publisher", width: 150 },
+    { field: "dateDonated", headerName: "Donated Date", width: 100 },
+    { field: "audio", headerName: "Audio", width: 100 },
+    { field: "ISBN", headerName: "ISBN", width: 100 },
   ];
 
-  const rows = [];
+  // Convert donatedBooks to rows for DataGrid
+  const rows = donatedBooks.map((book) => ({
+    id: book._id,
+    coverImageUrl: book?.coverImageUrl,
+    title: book?.title,
+    author: book?.author,
+    language: book?.language,
+    genre: book?.genre,
+    publishedDate: book?.publishedDate?.slice(0, 10),
+    publisher: book?.publisher?.slice(0, 10),
+    dateDonated: book?.dateDonated?.slice(0, 10),
+    audio: book?.audio,
+    ISBN: book?.ISBN,
+  }));
 
-  const handleDelete = async (id) => {
-    try {
-      const { data } = await axios.delete(`${API}/donatedBooks/${id}`);
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+  if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error}</p>;
 
-    // allUsers();
-  };
   return (
     <section className="donated-books-container">
-      <h3 className="donated-books-title"> List of Donated Books </h3>
+      <h3 className="donated-books-title">List of Donated Books</h3>
 
       <aside className="add-new-donated-book">
         <h3 className="add-new-donated-book-title">
-          {" "}
-          Do you want to donate Book?
+          Do you want to donate a book?
         </h3>
         <button
           onClick={() => setOpenDonatedBook(true)}
@@ -64,60 +77,29 @@ const UserDonatedBooks = () => {
           Donate Book
         </button>
       </aside>
-      <DataGrid
-        // Rows
-        rows={rows}
-        // Columns
-        columns={columns}
-        // Initial state
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
-          },
-        }}
-        // Create search bar
-        slots={{ toolbar: GridToolbar }}
-        // Search a specific user
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        // Page size optons
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        disableRowSelectionOnClick
-        //
-      />
 
-      {confirmDeletion && (
-        <article className="service-delete-confirmation-wrapper">
-          <span
-            className="delete-icon"
-            onClick={() => setConfirmDeletion(false)}
-          >
-            X
-          </span>
-
-          <h3 className="you-want-delete-user">
-            Are you sure you want delete this service?
-          </h3>
-          <aside className="cancel-or-confirm-delete">
-            <p
-              className={`cancel-delete`}
-              onClick={() => setConfirmDeletion(false)}
-            >
-              cancel
-            </p>
-            <h3
-              className={`confirm-delete`}
-              onClick={() => setConfirmDeletion(false) || handleDelete(bookId)}
-            >
-              confirm
-            </h3>
-          </aside>
-        </article>
+      {donatedBooks.length === 0 ? (
+        <p>No donated books available.</p>
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
       )}
 
       {openDonatedBook && (

@@ -12,7 +12,6 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
   const initialFormData = {
     title: "",
     author: "",
-    ISBN: "",
     message: "",
     bookshelfId: "",
     userId: "",
@@ -22,7 +21,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
   const [bookshelves, setBookshelves] = useState([]);
   const [users, setUsers] = useState([]);
 
-  const { title, author, ISBN, message, bookshelfId, userId } = formData;
+  const { title, author, message, bookshelfId, userId } = formData;
 
   useEffect(() => {
     // Fetch all bookshelves
@@ -85,6 +84,7 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
         </span>
         <h3 className="donated-book-form-title">Donated Book</h3>
         <form onSubmit={handleSubmit} className="donated-book-form">
+          
           {/* Title */}
           <div className="input-container">
             <FaBookMedical className="input-icon" />
@@ -116,23 +116,6 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
               />
             <label htmlFor="author" className="input-label">
               Author
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          {/* ISBN */}
-          <div className="input-container">
-            <FaBookMedical className="input-icon" />
-            <input
-              type="text"
-              name="ISBN"
-              value={ISBN}
-              onChange={handleChange}
-              placeholder="ISBN"
-              className="input-field"
-            />
-            <label htmlFor="ISBN" className="input-label">
-              ISBN
             </label>
             <span className="input-highlight"></span>
           </div>

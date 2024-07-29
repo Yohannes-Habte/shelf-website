@@ -13,7 +13,7 @@ const UserProfilePage = () => {
         <h1
           className="user-profile-page-title"
           style={{
-            backgroundImage: `url(${currentUser.banner})`,
+            backgroundImage: `url(${currentUser?.banner})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -24,8 +24,8 @@ const UserProfilePage = () => {
         <figure className="image-container">
           <img
             className="user-image"
-            src={currentUser.image}
-            alt={currentUser.firstName}
+            src={currentUser?.image}
+            alt={currentUser?.firstName}
           />
         </figure>
 

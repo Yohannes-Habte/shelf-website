@@ -27,7 +27,14 @@ import {
   countUsersStart,
   countUsersSuccess,
   countUsersFailure,
+  fetchBorrowedBooksStart, 
+  fetchBorrowedBooksSuccess, 
+  fetchBorrowedBooksFailure, 
+  fetchDonatedBooksStart, 
+  fetchDonatedBooksSuccess, 
+  fetchDonatedBooksFailure 
 } from "../../reducers/user/userReducer";
+import { API } from "../../../utils/security/secreteKey";
 
 // Helper function to set user in localStorage
 const setUserInLocalStorage = (user) => {
@@ -50,7 +57,7 @@ export const registerUser = (userData) => async (dispatch) => {
 export const loginUser = (credentials) => async (dispatch) => {
   try {
     dispatch(loginStart());
-    const response = await axios.post("/api/users/login", credentials);
+    const response = await axios.post(`${API}/users/login`, credentials);
     dispatch(loginSuccess(response.data));
     setUserInLocalStorage(response.data);
   } catch (error) {
@@ -59,10 +66,10 @@ export const loginUser = (credentials) => async (dispatch) => {
 };
 
 // Update User Profile
-export const updateUserProfile = (userData) => async (dispatch) => {
+export const updateUserProfile = (userId, userData) => async (dispatch) => {
   try {
     dispatch(updateUserStart());
-    const response = await axios.put("/api/users/profile", userData);
+    const response = await axios.put(`${API}/users/${userId}`, userData);
     dispatch(updateUserSuccess(response.data));
     setUserInLocalStorage(response.data);
   } catch (error) {
@@ -74,7 +81,7 @@ export const updateUserProfile = (userData) => async (dispatch) => {
 export const logoutUser = () => async (dispatch) => {
   try {
     dispatch(logoutUserStart());
-    await axios.post("/api/users/logout");
+    await axios.post(`${API}/users/logout`);
     dispatch(logoutUserSuccess());
     localStorage.removeItem("user");
   } catch (error) {
@@ -83,10 +90,10 @@ export const logoutUser = () => async (dispatch) => {
 };
 
 // Delete User Profile
-export const deleteUserProfile = () => async (dispatch) => {
+export const deleteUserProfile = (userId) => async (dispatch) => {
   try {
     dispatch(deleteUserStart());
-    await axios.delete("/api/users/profile");
+    await axios.delete(`${API}/users/${userId}`);
     dispatch(deleteUserSuccess());
     localStorage.removeItem("user");
   } catch (error) {
@@ -98,7 +105,7 @@ export const deleteUserProfile = () => async (dispatch) => {
 export const changePassword = (passwordData) => async (dispatch) => {
   try {
     dispatch(changePasswordStart());
-    await axios.put("/api/users/password", passwordData);
+    await axios.put(`${API}/users/password`, passwordData);
     dispatch(changePasswordSuccess());
   } catch (error) {
     dispatch(changePasswordFailure(error.response.data.message));
@@ -109,7 +116,7 @@ export const changePassword = (passwordData) => async (dispatch) => {
 export const fetchUser = (userId) => async (dispatch) => {
   try {
     dispatch(fetchUserStart());
-    const response = await axios.get(`/api/users/${userId}`);
+    const response = await axios.get(`${API}/users/${userId}`);
     dispatch(fetchUserSuccess(response.data));
   } catch (error) {
     dispatch(fetchUserFailure(error.response.data.message));
@@ -120,7 +127,7 @@ export const fetchUser = (userId) => async (dispatch) => {
 export const fetchAllUsers = () => async (dispatch) => {
   dispatch(fetchAllUsersStart());
   try {
-    const response = await axios.get("/api/users");
+    const response = await axios.get(`${API}/users`);
     dispatch(fetchAllUsersSuccess(response.data));
   } catch (error) {
     dispatch(fetchAllUsersFailure(error.message));
@@ -131,9 +138,34 @@ export const fetchAllUsers = () => async (dispatch) => {
 export const countUsers = () => async (dispatch) => {
   dispatch(countUsersStart());
   try {
-    const response = await axios.get("/api/users/count");
+    const response = await axios.get(`${API}/users/count/total`);
     dispatch(countUsersSuccess(response.data));
   } catch (error) {
     dispatch(countUsersFailure(error.message));
+  }
+};
+
+
+// Thunk for fetching borrowed books
+export const fetchBorrowedBooks = (userId) => async (dispatch) => {
+  dispatch(fetchBorrowedBooksStart());
+  try {
+
+    const response = await axios.get(`${API}/users/${userId}/borrowed/books`);
+  
+    dispatch(fetchBorrowedBooksSuccess(response.data.result));
+  } catch (error) {
+    dispatch(fetchBorrowedBooksFailure(error.message));
+  }
+};
+
+// Thunk for fetching donated books
+export const fetchDonatedBooks = (userId) => async (dispatch) => {
+  dispatch(fetchDonatedBooksStart());
+  try {
+    const response = await axios.get(`${API}/users/${userId}/donated/books`);
+    dispatch(fetchDonatedBooksSuccess(response.data.result));
+  } catch (error) {
+    dispatch(fetchDonatedBooksFailure(error.message));
   }
 };

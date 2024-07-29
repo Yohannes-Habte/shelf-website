@@ -1,24 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AllDonatedBooks.scss";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import DonatedBookForm from "../../forms/DonatedBook/DonatedBookForm";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 import { toast } from "react-toastify";
-import { FaTrashAlt } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDonatedBooks } from "../../../redux/actions/donation/donatedBookAction";
+import { FaTrashAlt, FaEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const AllDonatedBooks = () => {
+  // Global state variables
+  const dispatch = useDispatch();
+  const { donatedBooks, loading, error } = useSelector(
+    (state) => state.donatedBook
+  );
+
+  useEffect(() => {
+    dispatch(fetchDonatedBooks());
+  }, [dispatch]);
+
+  // Local state variables
   const [bookId, setBookId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
-  const [openDonatedBook, setOpenDonatedBook] = useState(false);
 
   const columns = [
-    { field: "eventName", headerName: "Event Name", width: 250 },
-    { field: "eventPurpose", headerName: "Event PUrpose", width: 400 },
-    { field: "eventOrganizer", headerName: "Event Organizer", width: 150 },
-    { field: "eventFacilitator", headerName: "Event Facilitator", width: 150 },
-    { field: "eventAddress", headerName: "Event Address", width: 200 },
-    { field: "eventDate", headerName: "Event Date", width: 150 },
+    {
+      field: "coverImageUrl",
+      headerName: "Cover",
+      width: 70,
+      renderCell: (params) => (
+        <img
+          src={params.value}
+          alt={params.row.title}
+          style={{ width: "3rem", height: "2rem", objectFit: "contain" }}
+        />
+      ),
+    },
+    { field: "title", headerName: "Title", width: 350 },
+    { field: "author", headerName: "Author", width: 300 },
+    { field: "language", headerName: "Language", width: 150 },
+    { field: "genre", headerName: "Genre", width: 150 },
+    { field: "publishedDate", headerName: "Published Date", width: 150 },
+    { field: "publisher", headerName: "Publisher", width: 150 },
+    { field: "dateDonated", headerName: "Donated Date", width: 100 },
+    { field: "audio", headerName: "Audio", width: 100 },
+    { field: "ISBN", headerName: "ISBN", width: 100 },
     {
       field: "action",
       headerName: "Action",
@@ -26,6 +53,10 @@ const AllDonatedBooks = () => {
       renderCell: (params) => {
         return (
           <div className="action-wrapper">
+            <Link to={`/donatedBooks/${params.id}`}>
+              <FaEdit className="edit" />
+            </Link>
+
             <FaTrashAlt
               onClick={() => setBookId(params.id) || setConfirmDeletion(true)}
               className="delete"
@@ -38,54 +69,61 @@ const AllDonatedBooks = () => {
 
   const rows = [];
 
-  const handleDelete = async (id) => {
-    try {
-      const { data } = await axios.delete(`${API}/donatedBooks/${id}`);
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+  donatedBooks &&
+    donatedBooks.length > 0 &&
+    donatedBooks.map((book) =>
+      rows.push({
+        id: book._id,
+        coverImageUrl: book.coverImageUrl,
+        title: book.title,
+        author: book.author,
+        language: book.language,
+        genre: book.genre.category,
+        publishedDate: book.publishedDate.slice(0, 10),
+        publisher: book.publisher.slice(0, 10),
+        dateDonated: book.dateDonated.slice(0, 10),
+        audio: book.audio,
+        ISBN: book.ISBN,
+      })
+    );
 
-    // allUsers();
+  const handleDelete = async () => {
+    try {
+      const { data } = await axios.delete(`${API}/donatedBooks/${bookId}`);
+      toast.success(data.message);
+      dispatch(fetchDonatedBooks()); // Refresh the list of donated books
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error deleting the book");
+    } finally {
+      setConfirmDeletion(false);
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <section className="donated-books-container">
-      <h3 className="donated-books-title"> List of Donated Books </h3>
+      <h3 className="donated-books-title">List of Donated Books</h3>
 
-      <aside className="add-new-donated-book">
-        <h3 className="add-new-donated-book-title">Add New Donated Book</h3>
-        <button
-          onClick={() => setOpenDonatedBook(true)}
-          className="add-new-donated-book-btn"
-        >
-          Add New
-        </button>
-      </aside>
       <DataGrid
-        // Rows
         rows={rows}
-        // Columns
         columns={columns}
-        // Initial state
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        // Create search bar
         slots={{ toolbar: GridToolbar }}
-        // Search a specific user
         slotProps={{
           toolbar: {
             showQuickFilter: true,
             quickFilterProps: { debounceMs: 500 },
           },
         }}
-        // Page size optons
         pageSizeOptions={[5, 10]}
         checkboxSelection
         disableRowSelectionOnClick
-        //
       />
 
       {confirmDeletion && (
@@ -96,29 +134,21 @@ const AllDonatedBooks = () => {
           >
             X
           </span>
-
           <h3 className="you-want-delete-user">
-            Are you sure you want delete this service?
+            Are you sure you want to delete this book?
           </h3>
           <aside className="cancel-or-confirm-delete">
             <p
-              className={`cancel-delete`}
+              className="cancel-delete"
               onClick={() => setConfirmDeletion(false)}
             >
-              cancel
+              Cancel
             </p>
-            <h3
-              className={`confirm-delete`}
-              onClick={() => setConfirmDeletion(false) || handleDelete(bookId)}
-            >
-              confirm
+            <h3 className="confirm-delete" onClick={handleDelete}>
+              Confirm
             </h3>
           </aside>
         </article>
-      )}
-
-      {openDonatedBook && (
-        <DonatedBookForm setOpenDonatedBook={setOpenDonatedBook} />
       )}
     </section>
   );
