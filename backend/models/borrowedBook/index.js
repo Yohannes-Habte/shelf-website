@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const borrowedBookSchema = new Schema(
   {
     book: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
+    donatedBook: { type: mongoose.Schema.Types.ObjectId, ref: "DonatedBook"},
     title: { type: String, required: true },
     author: { type: String, required: true },
     dateBorrowed: { type: Date, default: Date.now },

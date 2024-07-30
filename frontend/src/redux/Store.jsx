@@ -5,6 +5,7 @@ import bookshelfReducer from "./reducers/bookshelf/bookshelfReducer";
 import commentReducer from "./reducers/comment/commentReducer";
 import bookReducer from "./reducers/book/bookReducer";
 import donatedBookReducer from "./reducers/donation/donatedBookReducer";
+import borrowBookReducer from "./reducers/borrow/borrowBookReducer";
 
 const Store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const Store = configureStore({
     comment: commentReducer,
     book: bookReducer,
     donatedBook: donatedBookReducer,
+    borrowedBook: borrowBookReducer,
   },
 });
 

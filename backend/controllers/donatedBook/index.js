@@ -3,38 +3,35 @@ import createError from "http-errors";
 import User from "../../models/user/index.js";
 import Bookshelf from "../../models/bookshelf/index.js";
 import mongoose from "mongoose";
+import Book from "../../models/book/index.js";
 
 //==========================================================================
 // Create New Borrowed book
 //==========================================================================
 
 export const createDonatedBook = async (req, res, next) => {
-  const { title, author, bookshelfId, userId } = req.body;
+  const { title, authors, language, audio, userId, bookshelfId } = req.body;
 
   try {
-    if (!title || !author || !userId || !bookshelfId) {
+    if (!title || !authors || !userId || !bookshelfId) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Check if the user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Check if the bookshelf exists
     const bookshelf = await Bookshelf.findById(bookshelfId);
     if (!bookshelf) {
       return res.status(400).json({ message: "Bookshelf not found" });
     }
 
-    // Create a new donated book
     const newDonatedBook = new DonatedBook({
       title,
-      author,
-      bookshelfId,
-      userId,
-      // Add other required fields here
+      authors,
+      language,
+      audio,
     });
 
     // Save the new donated book
@@ -58,6 +55,7 @@ export const createDonatedBook = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Donated book created successfully",
+      donatedBook: newDonatedBook,
     });
   } catch (error) {
     console.error(error); // Log the error for debugging
@@ -71,14 +69,17 @@ export const createDonatedBook = async (req, res, next) => {
 
 export const getDonatedBooks = async (req, res, next) => {
   try {
-    // Retrieve all donated books and populate relevant fields
+   
     const books = await DonatedBook.find()
-      .populate({ path: "genre", select: "category" }) // Populate the genre field
-      .populate({ path: "book", model: "Book" }) // Populate the 'book' reference
-      .populate({ path: "borrowedFrom", model: "Bookshelf" }); // Populate the 'borrowedFrom' reference
+      .populate({ path: "genre", select: "category" })
+      .populate({
+        path: "borrowedTimes",
+        select: "borrowedFrom",
+        populate: { path: "borrowedFrom", model: "Bookshelf" },
+      });
 
-    // Check if no books are found
-    if (books.length === 0) {
+  
+    if (!books || books.length === 0) {
       return res.status(200).json({
         success: true,
         message: "No donated books found.",
@@ -86,7 +87,7 @@ export const getDonatedBooks = async (req, res, next) => {
       });
     }
 
-    // Send successful response with books
+  
     return res.status(200).json({
       success: true,
       result: books,
@@ -94,8 +95,6 @@ export const getDonatedBooks = async (req, res, next) => {
   } catch (error) {
     // Log the error for debugging
     console.error("Error fetching donated books:", error);
-
-    // Send error response
     return next(
       createError(500, "Internal Server Error. Please try again later.")
     );

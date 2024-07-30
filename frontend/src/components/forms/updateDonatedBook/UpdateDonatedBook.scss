@@ -1,29 +1,118 @@
 @import "../../../styles/Variables.scss";
 @import "../../../styles/Mixins.scss";
 
+// .update-donated-book-modal {
+//   @include modal;
+
+//   .update-donated-book-popup-box {
+//     @include popupBox;
+//     padding: 2rem;
+
+//     .close-modal {
+//       @include closeModal;
+//     }
+
+//     .update-donated-book-form-title {
+//       @include subTitle;
+//     }
+
+//     .update-donated-book-form {
+//       @include flexColumn;
+
+//       .input-containers-wrapper {
+//         @include twoGridTemplateEqualColumns;
+//       }
+
+//       .input-container {
+//         @include inputContainer;
+
+//         .input-icon {
+//           @include inputIcon;
+//         }
+
+//         .input-field {
+//           color: $black;
+//           @include inputField;
+//         }
+
+//         .input-label {
+//           @include inputLabel;
+//         }
+
+//         .input-highlight {
+//           @include inputHighlight;
+//         }
+
+//         .input-field:focus + .input-label {
+//           @include focusInputFieldAndInputLabel;
+//         }
+
+//         .input-field:focus + .input-label + .input-highlight {
+//           width: 100%;
+//         }
+//       }
+
+//       .checkbox-container {
+//         display: flex;
+//         flex-direction: row;
+//         align-items: center;
+//         gap: 1rem;
+//         padding: 0 1rem;
+//         background-color: white;
+
+//         .input-icon {
+//           color: $green;
+//         }
+
+//         .checkbox-field {
+//           width: 1rem;
+//           height: 1rem;
+//         }
+//       }
+
+//       .update-donated-book-form-btn {
+//         @include button1;
+//       }
+//     }
+//   }
+// }
+
+// UpdateDonatedBook.scss
+
 .update-donated-book-modal {
-  @include modal;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 20px;
 
   .update-donated-book-popup-box {
-    @include popupBox;
-    padding: 2rem;
-
-    .close-modal {
-      @include closeModal;
-    }
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    overflow: auto;
 
     .update-donated-book-form-title {
-      @include subTitle;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
     }
 
     .update-donated-book-form {
-      @include flexColumn;
+      display: flex;
+      flex-direction: column;
 
-      .input-containers-wrapper {
-        @include twoGridTemplateEqualColumns;
-      }
-
-      .input-container {
+      .title-input-container {
         @include inputContainer;
 
         .input-icon {
@@ -52,26 +141,147 @@
         }
       }
 
-      .checkbox-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-        padding: 0 1rem;
-        background-color: white;
+      .author-input-wrapper {
+        width: 100%;
 
-        .input-icon {
-          color: $green;
+        .author-input-container {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          column-gap: 1rem;
+          margin-top: 1rem;
+
+          .input-container {
+            @include inputContainer;
+
+            .input-icon {
+              @include inputIcon;
+            }
+
+            .input-field {
+              color: $black;
+              @include inputField;
+            }
+
+            .input-label {
+              @include inputLabel;
+            }
+
+            .input-highlight {
+              @include inputHighlight;
+            }
+
+            .input-field:focus + .input-label {
+              @include focusInputFieldAndInputLabel;
+            }
+
+            .input-field:focus + .input-label + .input-highlight {
+              width: 100%;
+            }
+          }
         }
 
-       
-        .checkbox-field {
-          width: 1rem;
-          height: 1rem;
+        .add-author-btn {
+          background: #007bff;
+          color: #fff;
+          border: none;
+          padding: 5px 10px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          margin-top: 10px;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #0056b3;
+          }
         }
       }
 
-      .update-donated-book-form-btn {
+      .input-containers-wrapper {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 1rem;
+        row-gap: 1rem;
+        margin-top: 0.5rem;
+
+        .input-container {
+          @include inputContainer;
+
+          .input-icon {
+            @include inputIcon;
+          }
+
+          .input-field {
+            color: $black;
+            @include inputField;
+          }
+
+          .input-label {
+            @include inputLabel;
+          }
+
+          .input-highlight {
+            @include inputHighlight;
+          }
+
+          .input-field:focus + .input-label {
+            @include focusInputFieldAndInputLabel;
+          }
+
+          .input-field:focus + .input-label + .input-highlight {
+            width: 100%;
+          }
+        }
+
+        .audio-checkbox-container {
+          @include inputContainer;
+          gap: 0.5rem;
+          @include inputField;
+          align-items: center;
+
+          .input-icon {
+            @include inputIcon;
+          }
+
+          .checkbox-field {
+            margin-left: 1rem;
+            width: $nfs;
+            height: $nfs;
+          }
+        }
+      }
+
+      .textarea-field-container {
+        @include inputContainer;
+        margin: 1rem 0;
+
+        .input-icon {
+          @include inputIcon;
+        }
+
+        .input-field {
+          color: $black;
+          @include inputField;
+        }
+
+        .input-label {
+          @include inputLabel;
+        }
+
+        .input-highlight {
+          @include inputHighlight;
+        }
+
+        .input-field:focus + .input-label {
+          @include focusInputFieldAndInputLabel;
+        }
+
+        .input-field:focus + .input-label + .input-highlight {
+          width: 100%;
+        }
+      }
+
+      .update-donated-book-btn {
         @include button1;
       }
     }

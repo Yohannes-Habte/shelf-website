@@ -20,10 +20,6 @@
     .borrowed-book-form {
       @include flexColumn;
 
-      .input-containers-wrapper {
-        @include twoGridTemplateEqualColumns;
-      }
-
       .input-container {
         @include inputContainer;
 

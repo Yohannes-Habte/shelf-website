@@ -100,121 +100,118 @@ const BorrowedBookForm = ({ setOpenBorrowedBook }) => {
         <h3 className="borrowed-book-form-title">Borrowed Book</h3>
 
         <form onSubmit={handleSubmit} className="borrowed-book-form">
-          <div className="input-containers-wrapper">
+          {/* Book */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="book"
+              value={formData.book}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">Select a book</option>
+              {books &&
+                books.length !== 0 &&
+                books.map((book) => (
+                  <option key={book._id} value={book._id}>
+                    {book.title}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="book" className="input-label">
+              Book
+            </label>
+            <span className="input-highlight"></span>
+          </div>
 
-            {/* Book */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <select
-                name="book"
-                value={formData.book}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select a book</option>
-                {books &&
-                  books.length !== 0 &&
-                  books.map((book) => (
-                    <option key={book._id} value={book._id}>
-                      {book.title}
-                    </option>
-                  ))}
-              </select>
-              <label htmlFor="book" className="input-label">
-                Book
-              </label>
-              <span className="input-highlight"></span>
-            </div>
+          {/* Title */}
 
-            {/* Title */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="input-field"
+              required
+            >
+              <option value="">Select Title </option>
+              {books &&
+                books.length > 0 &&
+                books.map((book) => (
+                  <option key={book.id} value={book._id}>
+                    {book.title}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="title" className="input-label">
+              Title
+            </label>
+            <span className="input-highlight"></span>
+          </div>
 
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <select
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="input-field"
-                required
-              >
-                <option value="">Select Title </option>
-                {books &&
-                  books.length > 0 &&
-                  books.map((book) => (
-                    <option key={book.id} value={book._id}>
-                      {book.title}
-                    </option>
-                  ))}
-              </select>
-              <label htmlFor="title" className="input-label">
-                Title
-              </label>
-              <span className="input-highlight"></span>
-            </div>
+          {/* Author */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="author"
+              value={formData.author}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">Select Author</option>
+              {authors &&
+                authors.length > 0 &&
+                authors.map((author) => (
+                  <option key={author._id} value={author._id}>
+                    {author.firstName} {author.lastName}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="author" className="input-label">
+              Author
+            </label>
+            <span className="input-highlight"></span>
+          </div>
 
-            {/* Author */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <select
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select Author</option>
-                {authors &&
-                  authors.length > 0 &&
-                  authors.map((author) => (
-                    <option key={author._id} value={author._id}>
-                      {author.firstName} {author.lastName}
-                    </option>
-                  ))}
-              </select>
-              <label htmlFor="author" className="input-label">
-                Author
-              </label>
-              <span className="input-highlight"></span>
-            </div>
+          {/* Due Date */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <input
+              type="date"
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              placeholder="Due Date"
+              className="input-field"
+            />
+            <label htmlFor="dueDate" className="input-label">
+              Due Date
+            </label>
+            <span className="input-highlight"></span>
+          </div>
 
-            {/* Due Date */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                placeholder="Due Date"
-                className="input-field"
-              />
-              <label htmlFor="dueDate" className="input-label">
-                Due Date
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            {/* Borrowed From */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <select
-                name="borrowedFrom"
-                value={formData.borrowedFrom}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select a bookshelf</option>
-                {bookshelves &&
-                  bookshelves.map((shelf) => (
-                    <option key={shelf._id} value={shelf._id}>
-                      {shelf.name}
-                    </option>
-                  ))}
-              </select>
-              <label htmlFor="borrowedFrom" className="input-label">
-                Borrowed From
-              </label>
-              <span className="input-highlight"></span>
-            </div>
+          {/* Borrowed From */}
+          <div className="input-container">
+            <FaBookMedical className="input-icon" />
+            <select
+              name="borrowedFrom"
+              value={formData.borrowedFrom}
+              onChange={handleChange}
+              className="input-field"
+            >
+              <option value="">Select a bookshelf</option>
+              {bookshelves &&
+                bookshelves.map((shelf) => (
+                  <option key={shelf._id} value={shelf._id}>
+                    {shelf.name}
+                  </option>
+                ))}
+            </select>
+            <label htmlFor="borrowedFrom" className="input-label">
+              Borrowed From
+            </label>
+            <span className="input-highlight"></span>
           </div>
 
           <button type="submit" className="borrowed-book-form-btn">

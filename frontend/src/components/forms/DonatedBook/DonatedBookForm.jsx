@@ -1,27 +1,31 @@
 import "./DonatedBookForm.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaBookMedical } from "react-icons/fa";
-import { FaUserTie } from "react-icons/fa";
-import { MdMessage } from "react-icons/md";
 import { API } from "../../../utils/security/secreteKey";
 import { toast } from "react-toastify";
+import {
+  FaBook,
+  FaLanguage,
+  FaUser,
+  FaHeadphones,
+  FaBookReader,
+} from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const DonatedBookForm = ({ setOpenDonatedBook }) => {
-  // Step 1: Set up the initial state
-  const initialFormData = {
+  // Global state variables
+  const { currentUser } = useSelector((state) => state.user);
+
+  // Local state variables
+  const initialState = {
     title: "",
-    author: "",
-    message: "",
-    bookshelfId: "",
-    userId: "",
+    bookshelf: "",
+    language: "",
+    authors: [{ firstName: "", lastName: "" }],
+    audio: false,
   };
-
-  const [formData, setFormData] = useState(initialFormData);
+  const [bookData, setBookData] = useState(initialState);
   const [bookshelves, setBookshelves] = useState([]);
-  const [users, setUsers] = useState([]);
-
-  const { title, author, message, bookshelfId, userId } = formData;
 
   useEffect(() => {
     // Fetch all bookshelves
@@ -36,38 +40,53 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
     fetchBookshelves();
   }, []);
 
-  useEffect(() => {
-    // Fetch all users
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(`${API}/users`);
-        setUsers(response.data.result);
-      } catch (error) {
-        toast.error("Error fetching users");
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  // Step 2: Create the handleChange function
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
+    const { name, value, type, checked } = e.target;
+    setBookData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // Handle form reset
-  const handleReset = () => {
-    setFormData(initialFormData);
+  const handleAuthorChange = (index, e) => {
+    const { name, value } = e.target;
+    setBookData((prevData) => {
+      const newAuthors = [...prevData.authors];
+      newAuthors[index][name] = value;
+      return { ...prevData, authors: newAuthors };
+    });
   };
 
-  // Handle form submission
+  const addAuthor = () => {
+    setBookData((prevData) => ({
+      ...prevData,
+      authors: [...prevData.authors, { firstName: "", lastName: "" }],
+    }));
+  };
+
+  const removeAuthor = (index) => {
+    setBookData((prevData) => ({
+      ...prevData,
+      authors: prevData.authors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleReset = () => {
+    setBookData(initialState);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${API}/donatedBooks/new`, formData);
+      const newDonatedBook = {
+        ...bookData,
+        userId: currentUser._id,
+        bookshelfId: bookData.bookshelf,
+      };
+      const { data } = await axios.post(
+        `${API}/donatedBooks/new`,
+        newDonatedBook
+      );
       toast.success(data.message);
       handleReset();
     } catch (error) {
@@ -82,16 +101,15 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
         <span className="close-modal" onClick={() => setOpenDonatedBook(false)}>
           X
         </span>
-        <h3 className="donated-book-form-title">Donated Book</h3>
+        <h3 className="donated-book-form-title">Donate Book</h3>
         <form onSubmit={handleSubmit} className="donated-book-form">
-          
           {/* Title */}
           <div className="input-container">
-            <FaBookMedical className="input-icon" />
+            <FaBook className="input-icon" />
             <input
               type="text"
               name="title"
-              value={title}
+              value={bookData.title}
               onChange={handleChange}
               placeholder="Title"
               className="input-field"
@@ -103,89 +121,128 @@ const DonatedBookForm = ({ setOpenDonatedBook }) => {
             <span className="input-highlight"></span>
           </div>
 
-          {/* Author */}
+          {/* Language */}
           <div className="input-container">
-            <FaUserTie className="input-icon" />
-            <input
-              type="text"
-              name="author"
-              value={author}
+            <FaLanguage className="input-icon" />
+            <select
+              name="language"
+              value={bookData.language}
               onChange={handleChange}
-              placeholder="Author"
               className="input-field"
-              />
-            <label htmlFor="author" className="input-label">
-              Author
+            >
+              <option value="" disabled>
+                Select Language
+              </option>
+              <option value="english">English</option>
+              <option value="german">German</option>
+            </select>
+            <label htmlFor="language" className="input-label">
+              Language
             </label>
             <span className="input-highlight"></span>
           </div>
 
           {/* Select Bookshelf */}
           <div className="input-container">
-            <FaBookMedical className="input-icon" />
+            <FaBookReader className="input-icon" />
             <select
-              name="bookshelfId"
-              value={bookshelfId}
+              name="bookshelf"
+              value={bookData.bookshelf}
               onChange={handleChange}
               className="input-field"
             >
-              <option value="">Select Bookshelf</option>
-              {bookshelves &&
-                bookshelves.map((shelf) => (
-                  <option key={shelf._id} value={shelf._id}>
-                    {shelf.name}
-                  </option>
-                ))}
+              <option value="" disabled>
+                Select Bookshelf
+              </option>
+              {bookshelves.map((shelf) => (
+                <option key={shelf._id} value={shelf._id}>
+                  {shelf.name}
+                </option>
+              ))}
             </select>
-            <label htmlFor="shelfId" className="input-label">
-              Select Bookshelf
+            <label htmlFor="bookshelf" className="input-label">
+              Bookshelf
             </label>
             <span className="input-highlight"></span>
           </div>
 
-          {/* Select Donator */}
-          <div className="input-container">
-            <FaBookMedical className="input-icon" />
-            <select
-              name="userId"
-              value={userId}
-              onChange={handleChange}
-              className="input-field"
-            >
-              <option value="">Select Donator</option>
-              {users &&
-                users.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.firstName} {user.lastName}
-                  </option>
-                ))}
-            </select>
-            <label htmlFor="userId" className="input-label">
-              Select Donator
-            </label>
-            <span className="input-highlight"></span>
-          </div>
-
-          {/* Message */}
-          <div className="input-container">
-            <MdMessage className="input-icon" />
+          {/* Audio */}
+          <div className="checkbox-container">
+            <FaHeadphones className="input-icon" />
             <input
-              type="text"
-              name="message"
-              value={message}
+              type="checkbox"
+              name="audio"
+              checked={bookData.audio}
               onChange={handleChange}
-              placeholder="Message"
-              className="input-field"
-              required
+              className="checkbox-field"
             />
-            <label htmlFor="message" className="input-label">
-              Message
+            <label htmlFor="audio" className="input-label">
+              Audio
             </label>
             <span className="input-highlight"></span>
+          </div>
+
+          {/* Authors */}
+          <div className="authors-inputs-container">
+            <label>Authors:</label>
+            {bookData.authors.map((author, index) => (
+              <div key={index} className="author-inputs-wrapper">
+                {/* First Name */}
+                <div className="input-container">
+                  <FaUser className="input-icon" />
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="First Name"
+                    value={author.firstName}
+                    onChange={(e) => handleAuthorChange(index, e)}
+                    className="input-field"
+                    required
+                  />
+                  <label htmlFor="firstName" className="input-label">
+                    First Name
+                  </label>
+                  <span className="input-highlight"></span>
+                </div>
+
+                {/* Last Name */}
+                <div className="input-container">
+                  <FaUser className="input-icon" />
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last Name"
+                    value={author.lastName}
+                    onChange={(e) => handleAuthorChange(index, e)}
+                    className="input-field"
+                    required
+                  />
+                  <label htmlFor="lastName" className="input-label">
+                    Last Name
+                  </label>
+                  <span className="input-highlight"></span>
+                </div>
+
+                <button
+                  type="button"
+                  className="remove-author-btn"
+                  onClick={() => removeAuthor(index)}
+                >
+                  Remove Author
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="add-author-btn"
+              onClick={addAuthor}
+            >
+              Add Author
+            </button>
           </div>
 
           <button type="submit" className="donated-book-form-btn">
-            Donate Book
+            Submit
           </button>
         </form>
       </section>

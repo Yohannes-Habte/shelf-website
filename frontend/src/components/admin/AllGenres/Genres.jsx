@@ -55,7 +55,10 @@ const Genres = () => {
     },
   ];
   return (
-    <section className="genres-table-container">
+    <section
+      className="genres-table-container"
+      style={{ height: "400px", width: "100%" }}
+    >
       <h3 className="genres-table-title"> List of Genres </h3>
 
       <aside className="add-new-genre">

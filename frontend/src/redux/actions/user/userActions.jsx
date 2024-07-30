@@ -117,7 +117,7 @@ export const fetchUser = (userId) => async (dispatch) => {
   try {
     dispatch(fetchUserStart());
     const response = await axios.get(`${API}/users/${userId}`);
-    dispatch(fetchUserSuccess(response.data));
+    dispatch(fetchUserSuccess(response.data.result));
   } catch (error) {
     dispatch(fetchUserFailure(error.response.data.message));
   }
@@ -128,7 +128,7 @@ export const fetchAllUsers = () => async (dispatch) => {
   dispatch(fetchAllUsersStart());
   try {
     const response = await axios.get(`${API}/users`);
-    dispatch(fetchAllUsersSuccess(response.data));
+    dispatch(fetchAllUsersSuccess(response.data.result));
   } catch (error) {
     dispatch(fetchAllUsersFailure(error.message));
   }
@@ -139,7 +139,7 @@ export const countUsers = () => async (dispatch) => {
   dispatch(countUsersStart());
   try {
     const response = await axios.get(`${API}/users/count/total`);
-    dispatch(countUsersSuccess(response.data));
+    dispatch(countUsersSuccess(response.data.result));
   } catch (error) {
     dispatch(countUsersFailure(error.message));
   }

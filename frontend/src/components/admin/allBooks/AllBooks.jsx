@@ -12,7 +12,6 @@ const AllBooks = () => {
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [openBook, setOpenBook] = useState(false);
 
-
   const handleDelete = async (id) => {
     try {
       const { data } = await axios.delete(`${API}/books/${id}`);
@@ -54,7 +53,10 @@ const AllBooks = () => {
 
   const rows = [];
   return (
-    <section className="books-table-container">
+    <section
+      className="books-table-container"
+      style={{ height: "400px", width: "100%" }}
+    >
       <h3 className="books-table-title"> List of Books </h3>
 
       <aside className="add-new-book">

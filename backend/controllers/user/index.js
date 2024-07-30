@@ -170,29 +170,32 @@ export const getTotalUsersCount = async (req, res, next) => {
 //====================================================================
 // Total user donated books
 //====================================================================
+
 export const getUserDonatedBooks = async (req, res, next) => {
   try {
     const userId = req.params.userId;
 
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(createError(400, "Invalid user ID format."));
+    }
+
     const user = await User.findById(userId).populate({
-      path: "donatedBooks._id", // The field in the User model that holds book references
-      model: "Book", // The Book model
-      select: "-__v", // Optionally exclude fields like __v if not needed
+      path: "donatedBooks",
+      model: "DonatedBook",
+      select: "-__v",
     });
 
     if (!user) {
       return next(createError(404, "User not found."));
     }
 
-    const donatedBooks = user.donatedBooks.map((book) => book._id); // Map to extract book details
-
-    if (!donatedBooks.length) {
+    if (!user.donatedBooks || user.donatedBooks.length === 0) {
       return next(createError(404, "No donated books found."));
     }
 
     return res.status(200).json({
       success: true,
-      result: donatedBooks, 
+      result: user.donatedBooks,
     });
   } catch (error) {
     return next(
@@ -206,43 +209,75 @@ export const getUserDonatedBooks = async (req, res, next) => {
 //====================================================================
 
 export const getUserBorrowedBooks = async (req, res, next) => {
-  const { userId } = req.params; // Get userId from request parameters
+  const { userId } = req.params;
 
   try {
- 
-    const user = await User.findById(userId)
-      .populate({
-        path: 'borrowedBooks._id', // Populate the `borrowedBooks` field
-        model: 'BorrowedBook', // Reference the BorrowedBook model
-        select: '-__v', // Optionally exclude fields like __v if not needed
-      });
-
-    
-    // Check if the user exists
-    if (!user) {
-      return next(createError(404, 'User not found.'));
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(createError(400, "Invalid user ID format."));
     }
 
-    // Extract and return the borrowedBooks array
-    const borrowedBooks = user.borrowedBooks.map(borrowedBook => borrowedBook._id);
+    const user = await User.findById(userId).populate({
+      path: "borrowedBooks",
+      populate: [
+        {
+          path: "book",
+          model: "Book",
+          populate: {
+            path: "genre",
+            model: "Genre",
+            select: "category",
+          },
+          select: "-__v",
+        },
+      ],
+    });
 
-    console.log("borrowed books=", borrowedBooks)
+    if (!user) {
+      return next(createError(404, "User not found."));
+    }
 
-    if (!borrowedBooks || borrowedBooks.length === 0) {
+    if (!user.borrowedBooks || user.borrowedBooks.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'No borrowed books found.',
-        result: []
+        message: "No borrowed books found.",
+        result: [],
       });
     }
+
+    // Format the response
+    const formattedBorrowedBooks = user.borrowedBooks.map((borrowedBook) => ({
+      book: {
+        title: borrowedBook.book.title,
+        genre: borrowedBook.book.genre ? borrowedBook.book.genre.category : "Unknown",
+        language: borrowedBook.book.language,
+        publishedDate: borrowedBook.book.publishedDate,
+        publisher: borrowedBook.book.publisher,
+        coverImageUrl: borrowedBook.book.coverImageUrl,
+        summary: borrowedBook.book.summary,
+        ISBN: borrowedBook.book.ISBN,
+        audio: borrowedBook.book.audio,
+        authors: borrowedBook.book.authors.map((author) => ({
+          firstName: author.firstName,
+          lastName: author.lastName,
+          birthDate: author.birthDate,
+          deathDate: author.deathDate,
+        })),
+        borrowedTimes: borrowedBook.book.borrowedTimes,
+        status: borrowedBook.book.status,
+        ratings: borrowedBook.book.ratings,
+        reviews: borrowedBook.book.reviews,
+      },
+      borrowedDate: borrowedBook.borrowedDate,
+      returnDate: borrowedBook.returnDate,
+    }));
 
     return res.status(200).json({
       success: true,
-      result: borrowedBooks
+      result: formattedBorrowedBooks,
     });
   } catch (error) {
-    console.error('Error fetching borrowed books:', error);
-    return next(createError(500, 'Internal Server Error. Please try again later.'));
+    return next(
+      createError(500, "Internal Server Error. Please try again later.")
+    );
   }
 };
-

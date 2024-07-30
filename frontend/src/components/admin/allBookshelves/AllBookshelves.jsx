@@ -81,7 +81,10 @@ const AllBookshelves = () => {
     },
   ];
   return (
-    <section className="bookshelves-table-container">
+    <section
+      className="bookshelves-table-container"
+      style={{ height: "400px", width: "100%" }}
+    >
       <h3 className="bookshelves-table-title"> List of Bookshelves </h3>
 
       <aside className="add-new-bookshelf">

@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 import { Rating } from "@mui/material";
+import BorrowedBookForm from "../../../components/forms/borrow/BorrowedBookForm";
 
 const BookPage = () => {
   const { bookId } = useParams();
   const [book, setBook] = useState({});
+  const [openBorrowedBook, setOpenBorrowedBook] = useState(false)
 
   // Get a single book
   useEffect(() => {
@@ -59,8 +61,10 @@ const BookPage = () => {
 
             <p className="book-summary">{book.summary}</p>
 
-            <button className="borrow-book-btn">Borrow Book</button>
+            <button onClick={() => setOpenBorrowedBook(true)} className="borrow-book-btn">Borrow Book</button>
           </article>
+
+          {openBorrowedBook && <BorrowedBookForm setOpenBorrowedBook={setOpenBorrowedBook} />}
         </div>
       </section>
     </main>

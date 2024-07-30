@@ -8,7 +8,13 @@ import Bookshelf from "../../models/bookshelf/index.js";
 // Create New Borrowed book
 //==========================================================================
 export const createBorrowedBook = async (req, res, next) => {
-  const { title, author, dueDate, book: bookId, borrowedFrom: bookshelfId } = req.body;
+  const {
+    title,
+    author,
+    dueDate,
+    book: bookId,
+    borrowedFrom: bookshelfId,
+  } = req.body;
   const userId = req.params.id;
 
   try {
@@ -18,7 +24,8 @@ export const createBorrowedBook = async (req, res, next) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
     if (!book) return res.status(404).json({ message: "Book not found" });
-    if (!bookshelf) return res.status(404).json({ message: "Bookshelf not found" });
+    if (!bookshelf)
+      return res.status(404).json({ message: "Bookshelf not found" });
 
     const borrowedBook = new BorrowedBook({
       title,
@@ -56,34 +63,32 @@ export const createBorrowedBook = async (req, res, next) => {
   }
 };
 
-
 //==========================================================================
 // Get all books
 //==========================================================================
-
 export const getBorrowedBooks = async (req, res, next) => {
-  const userId = req.params.id;
-
   try {
-    const user = await User.findById(userId).populate("borrowedBooks");
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const books = await BorrowedBook.find()
+      .populate({
+        path: "book",
+        model: "Book",
+        select: "-reviews",
+        populate: {
+          path: "genre",  // Populate the genre field
+          model: "Genre", // Assuming you have a Genre model
+          select: "category" // Select only the category field from Genre
+        }
+      })
+      .populate({
+        path: "borrowedFrom",
+        model: "Bookshelf",
+      });
+      
+    if (!books) {
+      return res.status(404).json({ message: "Borrowed books not found" });
     }
 
-    if (!user.borrowedBooks || user.borrowedBooks.length === 0) {
-      return res.status(200).json({ borrowedBooks: [] });
-    }
-
-    const borrowedBooks = user.borrowedBooks.map((borrowedBook) => ({
-      title: borrowedBook.title,
-      author: borrowedBook.author,
-      dueDate: borrowedBook.dueDate,
-      bookId: borrowedBook.book,
-      borrowedFrom: borrowedBook.borrowedFrom,
-    }));
-
-    res.status(200).json({ borrowedBooks });
+    res.status(200).json({ success: true, result: books });
   } catch (error) {
     console.error("Error fetching borrowed books:", error);
     res.status(500).json({
@@ -92,8 +97,10 @@ export const getBorrowedBooks = async (req, res, next) => {
     });
   }
 };
+
+
 //==========================================================================
-// Get single book
+// Get single borrowed book
 //==========================================================================
 export const getBorrowedBook = async (req, res, next) => {
   const borrowedBookId = req.params.id;
@@ -102,7 +109,7 @@ export const getBorrowedBook = async (req, res, next) => {
     return res.status(400).json({ message: "Invalid borrowed book ID" });
   }
 
-  if (req.user.role !== "generalManager") {
+  if (req.user.role !== "admin") {
     return res
       .status(403)
       .json({ message: "Forbidden: to perform such action" });

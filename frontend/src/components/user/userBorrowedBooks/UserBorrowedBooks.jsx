@@ -6,21 +6,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBorrowedBooks } from "../../../redux/actions/user/userActions";
 
 const UserBorrowedBooks = () => {
-  // Global state variables
   const dispatch = useDispatch();
-  const { borrowedBooks, currentUser, loading, error } = useSelector(
-    (state) => state.user
-  );
+  const {
+    borrowedBooks = [],
+    currentUser,
+    loading,
+    error,
+  } = useSelector((state) => state.user);
   const [openBorrowedBook, setOpenBorrowedBook] = useState(false);
-
-  console.log("borrowed books", borrowedBooks);
-  console.log("user =", currentUser._id);
 
   useEffect(() => {
     if (currentUser) {
       dispatch(fetchBorrowedBooks(currentUser._id));
     }
   }, [dispatch, currentUser]);
+
+  // Log the borrowedBooks data
+  useEffect(() => {
+    console.log("Fetched borrowedBooks:", borrowedBooks);
+  }, [borrowedBooks]);
 
   const columns = [
     {
@@ -35,47 +39,42 @@ const UserBorrowedBooks = () => {
         />
       ),
     },
-    { field: "title", headerName: "Title", width: 350 },
-    { field: "author", headerName: "Author", width: 300 },
+    { field: "title", headerName: "Title", width: 250 },
+    { field: "author", headerName: "Author(s)", width: 200 },
     { field: "language", headerName: "Language", width: 150 },
     { field: "genre", headerName: "Genre", width: 150 },
     { field: "publishedDate", headerName: "Published Date", width: 150 },
     { field: "publisher", headerName: "Publisher", width: 150 },
-    { field: "dateDonated", headerName: "Donated Date", width: 100 },
     { field: "audio", headerName: "Audio", width: 100 },
     { field: "ISBN", headerName: "ISBN", width: 100 },
   ];
 
-  const rows = [];
-
-  borrowedBooks &&
-    borrowedBooks.length > 0 &&
-    borrowedBooks.map((book) =>
-      rows.push({
-        id: book._id,
-        coverImageUrl: book?.coverImageUrl,
-        title: book?.title,
-        author: book?.author,
-        language: book?.language,
-        genre: book?.genre,
-        publishedDate: book?.publishedDate?.slice(0, 10),
-        publisher: book?.publisher?.slice(0, 10),
-        dateDonated: book?.dateDonated?.slice(0, 10),
-        audio: book?.audio,
-        ISBN: book?.ISBN,
-      })
-    );
+  const rows = borrowedBooks.map((item) => ({
+    id: item._id || `fallback-id-${Math.random()}`, // Ensure id is always unique
+    coverImageUrl: item.book.coverImageUrl || '',
+    title: item.book.title || '',
+    author: item.book.authors?.map(
+      (author) => `${author.firstName || ''} ${author.lastName || ''}`
+    ).join(", ") || 'Unknown',
+    language: item.book.language || 'Unknown',
+    genre: item.book.genre || 'Unknown',
+    publishedDate: item.book.publishedDate ? item.book.publishedDate.slice(0, 10) : '',
+    publisher: item.book.publisher ?item. book.publisher.slice(0, 10) : '',
+    dateDonated: item.book.dateDonated ? item.book.dateDonated.slice(0, 10) : '',
+    audio: item.book.audio ? "Yes" : "No",
+    ISBN: item.book.ISBN || 'Unknown',
+  }));
 
   if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error}</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <section className="borrowed-books-container">
-      <h3 className="borrowed-books-title"> List of Borrowed Books </h3>
+      <h3 className="borrowed-books-title">List of Borrowed Books</h3>
 
       <aside className="add-new-borrowed-book">
         <h3 className="add-new-borrowed-book-title">
-          Do you want to Borrow Book?{" "}
+          Do you want to Borrow a Book?
         </h3>
         <button
           onClick={() => setOpenBorrowedBook(true)}
@@ -84,7 +83,7 @@ const UserBorrowedBooks = () => {
           Borrow Book
         </button>
       </aside>
-      {borrowedBooks.length === 0 ? (
+      {rows.length === 0 ? (
         <p>No borrowed books available.</p>
       ) : (
         <DataGrid

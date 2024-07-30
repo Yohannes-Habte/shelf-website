@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import {
   FaBookMedical,
   FaUser,
-  FaComment,
   FaList,
   FaUserTag,
   FaTags,
@@ -23,16 +22,14 @@ import {
   FaBarcode,
   FaVolumeUp,
 } from "react-icons/fa";
-
 import { updateDonatedBook } from "../../../redux/actions/donation/donatedBookAction";
 import { useNavigate } from "react-router-dom";
 
-const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
-  const navigate = useNavigate()
+const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
-    author: "",
-    message: "",
+    authors: [{ firstName: "", lastName: "" }],
     bookshelfId: "",
     userId: "",
     genre: "",
@@ -44,10 +41,10 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
     ISBN: "",
     audio: false,
   });
+
   const {
     title,
-    author,
-    message,
+    authors,
     bookshelfId,
     userId,
     genre,
@@ -59,12 +56,12 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
     ISBN,
     audio,
   } = formData;
+
   useEffect(() => {
     if (book) {
       setFormData({
         title: book.title || "",
-        author: book.author || "",
-        message: book.message || "",
+        authors: book.authors || [{ firstName: "", lastName: "" }],
         bookshelfId: book.bookshelfId || "",
         userId: book.userId || "",
         genre: book.genre || "",
@@ -84,7 +81,6 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
   const [genres, setGenres] = useState([]);
 
   useEffect(() => {
-    // Fetch all bookshelves
     const fetchBookshelves = async () => {
       try {
         const response = await axios.get(`${API}/bookshelves`);
@@ -97,7 +93,6 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
   }, []);
 
   useEffect(() => {
-    // Fetch all users
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`${API}/users`);
@@ -110,13 +105,12 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
   }, []);
 
   useEffect(() => {
-    // Fetch all bookshelves
     const fetchGenres = async () => {
       try {
         const response = await axios.get(`${API}/genres`);
         setGenres(response.data.result);
       } catch (error) {
-        toast.error("Error fetching bookshelves");
+        toast.error("Error fetching genres");
       }
     };
     fetchGenres();
@@ -131,12 +125,30 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
     }));
   };
 
-  // Handle form reset
+  const handleAuthorsChange = (index, event) => {
+    const { name, value } = event.target;
+    const updatedAuthors = [...authors];
+    updatedAuthors[index] = {
+      ...updatedAuthors[index],
+      [name]: value,
+    };
+    setFormData((prevState) => ({
+      ...prevState,
+      authors: updatedAuthors,
+    }));
+  };
+
+  const addAuthor = () => {
+    setFormData((prevState) => ({
+      ...prevState,
+      authors: [...prevState.authors, { firstName: "", lastName: "" }],
+    }));
+  };
+
   const handleReset = () => {
     setFormData({
       title: "",
-      author: "",
-      message: "",
+      authors: [{ firstName: "", lastName: "" }],
       bookshelfId: "",
       userId: "",
       genre: "",
@@ -149,50 +161,47 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
       audio: false,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formDataToUpload = new FormData();
+    if (coverImageUrl) {
+      formDataToUpload.append("file", coverImageUrl);
+      formDataToUpload.append("cloud_name", cloud_name);
+      formDataToUpload.append("upload_preset", upload_preset);
+    }
 
-    const formData = new FormData();
-    formData.append("file", coverImageUrl);
-    formData.append("cloud_name", cloud_name);
-    formData.append("upload_preset", upload_preset);
-
-    // Upload to Cloudinary
-    const response = await axios.post(cloud_URL, formData);
-    const imageUrl = response.data.secure_url;
+    let imageUrl = "";
 
     try {
+      if (coverImageUrl) {
+        const response = await axios.post(cloud_URL, formDataToUpload);
+        imageUrl = response.data.secure_url;
+      }
+
       const updateBook = {
-        title: title,
-        author: author,
-        message: message,
-        bookshelfId: bookshelfId,
-        userId: userId,
-        genre: genre,
-        language: language,
-        publishedDate: publishedDate,
-        publisher: publisher,
-        coverImageUrl: imageUrl,
-        summary: summary,
-        ISBN: ISBN,
-        audio: audio,
+        title,
+        authors,
+        bookshelfId,
+        userId,
+        genre,
+        language,
+        publishedDate,
+        publisher,
+        coverImageUrl: imageUrl || formData.coverImageUrl,
+        summary,
+        ISBN,
+        audio,
       };
+
       await dispatch(updateDonatedBook(bookId, updateBook));
 
       handleReset();
-
       toast.success("Book updated successfully!");
-      navigate("/admin/dashboard")
+      navigate("/admin/dashboard");
     } catch (error) {
       console.error("Error updating book:", error);
-
-      if (error.response) {
-        toast.error(`Error: ${error.response.data.message || "Server Error"}`);
-      } else if (error.request) {
-        toast.error("Network Error: No response from the server");
-      } else {
-        toast.error(`Error: ${error.message}`);
-      }
+      toast.error(`Error: ${error.response?.data?.message || "Server Error"}`);
     }
   };
 
@@ -207,79 +216,86 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
       <section className="update-donated-book-popup-box">
         <h3 className="update-donated-book-form-title">Update Donated Book</h3>
         <form onSubmit={handleSubmit} className="update-donated-book-form">
+          {/* Title */}
+          <div className="title-input-container">
+            <FaBookMedical className="input-icon" />
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={handleChange}
+              placeholder="Title"
+              className="input-field"
+            />
+            <label htmlFor="title" className="input-label">
+              Title
+            </label>
+            <span className="input-highlight"></span>
+          </div>
+
+          {/* Authors */}
+          <div className="author-input-wrapper">
+            {authors.map((author, index) => (
+              <div key={index} className="author-input-container">
+                <div className="input-container">
+                  <FaUser className="input-icon" />
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={author.firstName}
+                    onChange={(e) => handleAuthorsChange(index, e)}
+                    placeholder="First Name"
+                    className="input-field"
+                  />
+                  <label htmlFor={"firstName"} className="input-label">
+                    Author First Name
+                  </label>
+                  <span className="input-highlight"></span>
+                </div>
+                <div className="input-container">
+                  <FaUser className="input-icon" />
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={author.lastName}
+                    onChange={(e) => handleAuthorsChange(index, e)}
+                    placeholder="Last Name"
+                    className="input-field"
+                  />
+                  <label htmlFor={"lastName"} className="input-label">
+                    Author Last Name
+                  </label>
+                  <span className="input-highlight"></span>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addAuthor}
+              className="add-author-btn"
+            >
+              Update Authors
+            </button>
+          </div>
+
           <div className="input-containers-wrapper">
-            {/* Title */}
-            <div className="input-container">
-              <FaBookMedical className="input-icon" />
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Title"
-                className="input-field"
-              />
-              <label htmlFor="title" className="input-label">
-                Title
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            {/* Author */}
-            <div className="input-container">
-              <FaUser className="input-icon" />
-              <input
-                type="text"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                placeholder="Author"
-                className="input-field"
-              />
-              <label htmlFor="author" className="input-label">
-                Author
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
-            {/* Message */}
-            <div className="input-container">
-              <FaComment className="input-icon" />
-              <input
-                type="text"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Message"
-                className="input-field"
-              />
-              <label htmlFor="message" className="input-label">
-                Message
-              </label>
-              <span className="input-highlight"></span>
-            </div>
-
             {/* Bookshelf ID */}
             <div className="input-container">
               <FaList className="input-icon" />
               <select
                 name="bookshelfId"
-                value={formData.bookshelfId}
+                value={bookshelfId}
                 onChange={handleChange}
-                placeholder="Bookshelf ID"
                 className="input-field"
               >
                 <option value="">Select Bookshelf</option>
-                {bookshelves &&
-                  bookshelves.map((shelf) => (
-                    <option key={shelf._id} value={shelf._id}>
-                      {shelf.name}
-                    </option>
-                  ))}
+                {bookshelves.map((shelf) => (
+                  <option key={shelf._id} value={shelf._id}>
+                    {shelf.name}
+                  </option>
+                ))}
               </select>
-              <label htmlFor="shelfId" className="input-label">
-                Select Bookshelf
-              </label>
+              <span className="input-highlight"></span>
             </div>
 
             {/* User ID */}
@@ -287,22 +303,17 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
               <FaUserTag className="input-icon" />
               <select
                 name="userId"
-                value={formData.userId}
+                value={userId}
                 onChange={handleChange}
-                placeholder="User ID"
                 className="input-field"
               >
                 <option value="">Select Donator</option>
-                {users &&
-                  users.map((user) => (
-                    <option key={user._id} value={user._id}>
-                      {user.firstName} {user.lastName}
-                    </option>
-                  ))}
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+                ))}
               </select>
-              <label htmlFor="userId" className="input-label">
-                Select Donator
-              </label>
               <span className="input-highlight"></span>
             </div>
 
@@ -310,23 +321,19 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
             <div className="input-container">
               <FaTags className="input-icon" />
               <select
-                type="text"
                 name="genre"
-                value={book?.genre}
+                value={genre}
                 onChange={handleChange}
                 className="input-field"
               >
                 <option value="">Select Genre</option>
-                {genres &&
-                  genres.map((genre) => (
-                    <option key={genre._id} value={genre._id}>
-                      {genre.category}
-                    </option>
-                  ))}
+                {genres.map((gen) => (
+                  <option key={gen._id} value={gen._id}>
+                    {gen.category}
+                  </option>
+                ))}
               </select>
-              <label htmlFor="" className="input-label">
-                Book Genre
-              </label>
+            
               <span className="input-highlight"></span>
             </div>
 
@@ -335,19 +342,14 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
               <FaLanguage className="input-icon" />
               <select
                 name="language"
-                value={formData.language}
+                value={language}
                 onChange={handleChange}
-                placeholder="Language"
                 className="input-field"
               >
-                <option value="default">Select Language</option>
+                <option value="">Select Language</option>
                 <option value="english">English</option>
                 <option value="german">German</option>
               </select>
-
-              <label htmlFor="language" className="input-label">
-                Select Language
-              </label>
               <span className="input-highlight"></span>
             </div>
 
@@ -357,9 +359,8 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
               <input
                 type="date"
                 name="publishedDate"
-                value={formData.publishedDate}
+                value={publishedDate}
                 onChange={handleChange}
-                placeholder="Published Date"
                 className="input-field"
               />
               <label htmlFor="publishedDate" className="input-label">
@@ -374,7 +375,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
               <input
                 type="text"
                 name="publisher"
-                value={formData.publisher}
+                value={publisher}
                 onChange={handleChange}
                 placeholder="Publisher"
                 className="input-field"
@@ -393,7 +394,6 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
                 name="coverImageUrl"
                 onChange={handleChange}
                 className="input-field"
-                accept="image/*"
               />
               <label htmlFor="coverImageUrl" className="input-label">
                 Cover Image
@@ -407,7 +407,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
               <input
                 type="text"
                 name="ISBN"
-                value={formData.ISBN}
+                value={ISBN}
                 onChange={handleChange}
                 placeholder="ISBN"
                 className="input-field"
@@ -419,30 +419,29 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
             </div>
 
             {/* Audio */}
-            <div className="checkbox-container">
+            <div className="audio-checkbox-container">
               <FaVolumeUp className="input-icon" />
               <input
                 type="checkbox"
                 name="audio"
-                checked={formData.audio}
+                checked={audio}
                 onChange={handleChange}
                 className="checkbox-field"
               />
               <label htmlFor="audio" className="input-label">
                 Audio
               </label>
-              <span className="input-highlight"></span>
             </div>
           </div>
 
           {/* Summary */}
-          <div className="input-container">
+          <div className="textarea-field-container">
             <FaAlignLeft className="input-icon" />
             <textarea
               name="summary"
-              value={formData.summary}
+              role={"6"}
+              value={summary}
               onChange={handleChange}
-              rows={4}
               placeholder="Summary"
               className="input-field"
             />
@@ -451,9 +450,8 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, loading, error }) => {
             </label>
             <span className="input-highlight"></span>
           </div>
-
-          <button disabled={loading} className="update-donated-book-form-btn">
-            {loading ? "Loading..." : "Update Book"}
+          <button type="submit" className="update-donated-book-btn">
+            Update Book
           </button>
         </form>
       </section>
