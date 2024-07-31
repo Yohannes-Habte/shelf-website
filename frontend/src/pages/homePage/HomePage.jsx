@@ -7,7 +7,7 @@ const HomePage = () => {
   return (
     <main className="home-page">
       <Helmet>
-        <title> BookLook </title>
+        <title> BookLooks </title>
       </Helmet>
       <Header />
       <section className="home-page-container">

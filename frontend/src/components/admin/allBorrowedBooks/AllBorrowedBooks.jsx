@@ -16,8 +16,6 @@ const AllBorrowedBooks = () => {
     (state) => state.borrowedBook
   );
 
-  
-
   useEffect(() => {
     dispatch(fetchBorrowedBooks());
   }, [dispatch]);
@@ -98,32 +96,29 @@ const AllBorrowedBooks = () => {
       // const { book, title, author, dueDate, borrowedFrom, status, dateBorrowed } = borrowedBook;
       const { book } = borrowedBook;
 
-
       return {
         id: borrowedBook._id,
-        coverImageUrl: book.coverImageUrl || "",
-        title: book.title || "",
-        authors: book.authors || [],
-        language: book.language || "Unknown",
-        genre: book.genre ? book.genre : {}, // Handle missing genre
-        publishedDate: book.publishedDate
-          ? new Date(book.publishedDate).toISOString().slice(0, 10)
+        coverImageUrl: book?.coverImageUrl || "",
+        title: book?.title || "",
+        authors: book?.authors || [],
+        language: book?.language || "Unknown",
+        genre: book?.genre ? book?.genre : {}, // Handle missing genre
+        publishedDate: book?.publishedDate
+          ? new Date(book?.publishedDate).toISOString().slice(0, 10)
           : "Unknown",
-        publisher: book.publisher || "Unknown",
-        ISBN: book.ISBN || "Unknown",
+        publisher: book?.publisher || "Unknown",
+        ISBN: book?.ISBN || "Unknown",
         // Additional fields from BorrowedBook if needed
         // You can add them to the columns definition if needed
       };
     }) || [];
 
-
-
   // Handle book deletion
   const handleDelete = async () => {
     try {
-      const { data } = await axios.delete(`${API}/donatedBooks/${bookId}`);
+      const { data } = await axios.delete(`${API}/borrowedBooks/${bookId}`);
       toast.success(data.message);
-      dispatch(fetchBorrowedBooks()); // Refresh the list of borrowed books
+      dispatch(fetchBorrowedBooks()); 
     } catch (error) {
       toast.error(error.response?.data?.message || "Error deleting the book");
     } finally {

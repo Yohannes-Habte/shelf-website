@@ -22,6 +22,7 @@ const userSchema = new Schema(
     country: { type: String },
     borrowedBooks: [{ type: mongoose.Types.ObjectId, ref: "BorrowedBook" }],
     donatedBooks: [{ type: mongoose.Types.ObjectId, ref: "DonatedBook" }],
+    donatedBookshelves: [{ type: mongoose.Types.ObjectId, ref: "Bookshelf" }],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
     role: {
       type: String,

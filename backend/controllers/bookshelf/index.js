@@ -1,6 +1,10 @@
 import Bookshelf from "../../models/bookshelf/index.js";
 import createError from "http-errors";
 import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
+import Book from "../../models/book/index.js";
+import BorrowedBook from "../../models/borrowedBook/index.js";
+import DonatedBook from "../../models/donatedBook/index.js";
 
 //==========================================================================
 // Create a bookshelf
@@ -254,6 +258,10 @@ export const getBookshelves = async (req, res, next) => {
 export const getBookshelf = async (req, res, next) => {
   const bookshelfId = req.params.id;
 
+  if (!mongoose.Types.ObjectId.isValid(bookshelfId)) {
+    return next(createError(400, "Invalid bookshelf ID"));
+  }
+
   try {
     const bookshelf = await Bookshelf.findById(bookshelfId);
 
@@ -273,23 +281,59 @@ export const getBookshelf = async (req, res, next) => {
 //==========================================================================
 // Get single bookshelf
 //==========================================================================
+
 export const deleteBookshelf = async (req, res, next) => {
   const { id: bookshelfId } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(bookshelfId)) {
+    return next(createError(400, "Invalid bookshelf ID"));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const bookshelf = await Bookshelf.findById(bookshelfId);
+    const bookshelf = await Bookshelf.findById(bookshelfId).session(session);
 
     if (!bookshelf) {
+      await session.abortTransaction();
+      session.endSession();
       return next(createError(404, "Bookshelf not found"));
     }
 
-    await Bookshelf.findByIdAndDelete(bookshelfId);
+    // Remove the bookshelf's reference from related collections
+    await Book.updateMany(
+      { _id: { $in: bookshelf.books } },
+      { $pull: { bookshelves: bookshelfId } },
+      { session }
+    );
+
+    await BorrowedBook.updateMany(
+      { borrowedFrom: bookshelfId },
+      { $unset: { borrowedFrom: "" } },
+      { session }
+    );
+
+    await DonatedBook.updateMany(
+      { donatedTo: bookshelfId },
+      { $unset: { donatedTo: "" } },
+      { session }
+    );
+
+    // Delete the bookshelf
+    await Bookshelf.findByIdAndDelete(bookshelfId).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
       success: true,
       message: "Bookshelf has been successfully deleted",
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error deleting bookshelf:", error);
     return next(createError(500, "Internal server error"));
   }
 };
@@ -313,11 +357,11 @@ export const getAllBooksInBookshelf = async (req, res, next) => {
     
     */
 
-     // Find the bookshelf by its ID and populate the books, donatedBooks, and borrowedBooks fields
-     const bookshelf = await Bookshelf.findById(bookshelfId)
-     .populate({ path: 'books', model: 'Book' })
-     .populate({ path: 'donatedBooks', model: 'Book' })
-     .populate({ path: 'borrowedBooks', model: 'Book' });
+    // Find the bookshelf by its ID and populate the books, donatedBooks, and borrowedBooks fields
+    const bookshelf = await Bookshelf.findById(bookshelfId)
+      .populate({ path: "books", model: "Book" })
+      .populate({ path: "donatedBooks", model: "Book" })
+      .populate({ path: "borrowedBooks", model: "Book" });
 
     if (!bookshelf) {
       return next(createError(400, "Bookshelf not found!"));
@@ -399,7 +443,6 @@ export const countTotalBooksInBookshelf = async () => {
 
     const totalBooks = result.length > 0 ? result[0].totalBooksInAllShelf : 0;
 
-
     res.status(200).json({
       success: true,
       result: totalBooks,
@@ -435,7 +478,6 @@ export const calculateTotalAvailableBooks = async () => {
 
     const totalAvailableBooks =
       result.length > 0 ? result[0].bookshelfAvailableBooks : 0;
-   
 
     res.status(200).json({
       success: true,

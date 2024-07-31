@@ -29,15 +29,7 @@ const bookshelfSchema = new Schema(
     books: [{ type: mongoose.Types.ObjectId, ref: "Book" }],
     donatedBooks: [{ type: mongoose.Types.ObjectId, ref: "DonatedBook" }],
     borrowedBooks: [{ type: mongoose.Types.ObjectId, ref: "BorrowedBook" }],
-    ratings: { type: Number, default: 0 },
-    reviews: [
-      {
-        user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-        rating: { type: Number, min: 1, max: 5, required: true },
-        comment: { type: String },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
+    ratings: [{ type: Number }],
   },
   { timestamps: true }
 );

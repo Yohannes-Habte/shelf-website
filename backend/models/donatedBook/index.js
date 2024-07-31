@@ -28,16 +28,7 @@ const donatedBookSchema = new Schema(
       default: "available",
       enum: ["available", "borrowed"],
     },
-    ratings: { type: Number },
-    reviews: [
-      {
-        user: { type: mongoose.Types.ObjectId, ref: "User" },
-        rating: { type: Number },
-        comment: { type: String },
-        shelfId: { type: mongoose.Types.ObjectId, ref: "Bookshelf" },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
+    ratings: [{ type: Number }],
   },
   {
     timestamps: true,

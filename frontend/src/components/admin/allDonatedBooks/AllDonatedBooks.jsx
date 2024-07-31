@@ -108,8 +108,6 @@ const AllDonatedBooks = () => {
       ISBN: book.ISBN || "Unknown",
     })) || [];
 
-  
-
   // Handle book deletion
   const handleDelete = async () => {
     try {

@@ -3,6 +3,7 @@ import createError from "http-errors";
 import User from "../../models/user/index.js";
 import Book from "../../models/book/index.js";
 import Bookshelf from "../../models/bookshelf/index.js";
+import mongoose from "mongoose";
 
 //==========================================================================
 // Create New Borrowed book
@@ -43,6 +44,7 @@ export const createBorrowedBook = async (req, res, next) => {
 
     book.borrowedTimes = book.borrowedTimes || [];
     book.borrowedTimes.push(savedBorrowedBook._id);
+    book.status = "borrowed";
     await book.save();
 
     bookshelf.borrowedBooks = bookshelf.borrowedBooks || [];
@@ -74,16 +76,16 @@ export const getBorrowedBooks = async (req, res, next) => {
         model: "Book",
         select: "-reviews",
         populate: {
-          path: "genre",  // Populate the genre field
-          model: "Genre", // Assuming you have a Genre model
-          select: "category" // Select only the category field from Genre
-        }
+          path: "genre",
+          model: "Genre",
+          select: "category",
+        },
       })
       .populate({
         path: "borrowedFrom",
         model: "Bookshelf",
       });
-      
+
     if (!books) {
       return res.status(404).json({ message: "Borrowed books not found" });
     }
@@ -97,7 +99,6 @@ export const getBorrowedBooks = async (req, res, next) => {
     });
   }
 };
-
 
 //==========================================================================
 // Get single borrowed book
@@ -135,16 +136,10 @@ export const getBorrowedBook = async (req, res, next) => {
 // Delete a borrowed book
 //==========================================================================
 export const deleteBorrowedBook = async (req, res) => {
-  const bookId = req.params.bookId;
+  const bookId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return res.status(400).json({ message: "Invalid borrowed book ID" });
-  }
-
-  if (req.user.role !== "generalManager") {
-    return res
-      .status(403)
-      .json({ message: "Forbidden: to delete borrowed book" });
   }
 
   const session = await mongoose.startSession();
@@ -162,8 +157,8 @@ export const deleteBorrowedBook = async (req, res) => {
     // Update user
 
     const user = await User.findOneAndUpdate(
-      { "borrowedBooks._id": bookId },
-      { $pull: { borrowedBooks: { _id: bookId } } },
+      { borrowedBooks: bookId },
+      { $pull: { borrowedBooks: bookId } },
       { new: true, session }
     );
 
@@ -176,8 +171,8 @@ export const deleteBorrowedBook = async (req, res) => {
     // Update bookshelf
 
     const bookshelf = await Bookshelf.findOneAndUpdate(
-      { "borrowedBooks._id": bookId },
-      { $pull: { borrowedBooks: { _id: bookId } } },
+      { borrowedBooks: bookId },
+      { $pull: { borrowedBooks: bookId } },
       { new: true, session }
     );
 

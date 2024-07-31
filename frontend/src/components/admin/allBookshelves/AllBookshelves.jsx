@@ -16,9 +16,7 @@ import { API } from "../../../utils/security/secreteKey";
 const AllBookshelves = () => {
   // Global state variables
   const dispatch = useDispatch();
-  const { bookshelves, loading, error } = useSelector(
-    (state) => state.bookshelf
-  );
+  const { bookshelves } = useSelector((state) => state.bookshelf);
 
   // Local state variable
   const [bookshelfId, setBookshelfId] = useState("");
@@ -132,9 +130,6 @@ const AllBookshelves = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
   return (
     <section
       className="bookshelves-table-container"
@@ -169,6 +164,7 @@ const AllBookshelves = () => {
           </button>
         </div>
       </aside>
+
       <DataGrid
         rows={rows}
         columns={columns}

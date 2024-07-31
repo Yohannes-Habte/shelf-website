@@ -37,10 +37,15 @@ export const createDonatedBook = async (req, res, next) => {
     // Save the new donated book
     await newDonatedBook.save();
 
-    // Update the User's donatedBooks
+    // Update the User's donatedBooks and donatedBookshelves
     await User.findByIdAndUpdate(
       userId,
-      { $push: { donatedBooks: newDonatedBook._id } },
+      {
+        $push: {
+          donatedBooks: newDonatedBook._id,
+          donatedBookshelves: bookshelf._id,
+        },
+      },
       { new: true, runValidators: true }
     );
 
@@ -69,7 +74,6 @@ export const createDonatedBook = async (req, res, next) => {
 
 export const getDonatedBooks = async (req, res, next) => {
   try {
-   
     const books = await DonatedBook.find()
       .populate({ path: "genre", select: "category" })
       .populate({
@@ -78,7 +82,6 @@ export const getDonatedBooks = async (req, res, next) => {
         populate: { path: "borrowedFrom", model: "Bookshelf" },
       });
 
-  
     if (!books || books.length === 0) {
       return res.status(200).json({
         success: true,
@@ -87,7 +90,6 @@ export const getDonatedBooks = async (req, res, next) => {
       });
     }
 
-  
     return res.status(200).json({
       success: true,
       result: books,
@@ -171,7 +173,7 @@ export const updateDonatedBook = async (req, res, next) => {
       // Add the book to the new bookshelf
       const newBookshelf = await Bookshelf.findByIdAndUpdate(
         bookshelfId,
-        { $push: { donatedBooks: donatedBookId } },
+        { $push: { donatedBookshelves: donatedBookId } },
         { new: true }
       );
 
@@ -210,17 +212,12 @@ export const updateDonatedBook = async (req, res, next) => {
 //==========================================================================
 // Delete a donated book
 //==========================================================================
-export const deleteBorrowedBook = async (req, res) => {
-  const bookId = req.params.bookId;
+
+export const deleteDonatedBook = async (req, res) => {
+  const bookId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return res.status(400).json({ message: "Invalid donated book ID" });
-  }
-
-  if (req.user.role !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "Forbidden: to delete donated book" });
   }
 
   const session = await mongoose.startSession();
@@ -235,9 +232,10 @@ export const deleteBorrowedBook = async (req, res) => {
       return res.status(404).json({ message: "Donated book not found" });
     }
 
+    // Remove from donatedBooks in User model
     const user = await User.findOneAndUpdate(
-      { "donatedBooks._id": bookId },
-      { $pull: { donatedBooks: { _id: bookId } } },
+      { donatedBooks: bookId },
+      { $pull: { donatedBooks: bookId } },
       { new: true, session }
     );
 
@@ -247,9 +245,25 @@ export const deleteBorrowedBook = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Remove from donatedBookshelves in User model
+    const userDonatedBookshelf = await User.findOneAndUpdate(
+      { donatedBookshelves: bookId },
+      { $pull: { donatedBookshelves: bookId } },
+      { new: true, session }
+    );
+
+    if (!userDonatedBookshelf) {
+      await session.abortTransaction();
+      session.endSession();
+      return res
+        .status(404)
+        .json({ message: "User donated bookshelf not found" });
+    }
+
+    // Remove from donatedBooks in Bookshelf model
     const bookshelf = await Bookshelf.findOneAndUpdate(
-      { "donatedBooks._id": bookId },
-      { $pull: { donatedBooks: { _id: bookId } } },
+      { donatedBooks: bookId },
+      { $pull: { donatedBooks: bookId } },
       { new: true, session }
     );
 

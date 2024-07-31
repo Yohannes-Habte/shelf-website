@@ -1,39 +1,42 @@
 import { Link, useParams } from "react-router-dom";
 import "./BookCardForShelf.scss";
-import { Rating } from "@mui/material";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 import debounce from "lodash.debounce";
-
-/*
-
-Add a Debounce Mechanism to Prevent Too Many Requests
-Debouncing helps limit the number of API requests when a user interacts with the rating component. You can use the lodash.debounce library for this.
-
-npm install lodash.debounce
-
-*/
+import Rating from "../ratings/Rating";
 
 const BookCardForShelf = ({ book }) => {
   const { bookshelfId } = useParams();
-  // Local state variable
-  const [rating, setRating] = useState(book.ratings || 0);
+  const [averageRating, setAverageRating] = useState(0);
+
+  const fetchRating = async () => {
+    try {
+      const response = await axios.get(`${API}/books/${book._id}/rating`);
+      setAverageRating(response.data.averageRating);
+    } catch (error) {
+      console.error("Error fetching rating:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRating();
+  }, [book._id]);
 
   const updateRating = async (newRating) => {
     try {
-      await axios.put(`${API}/books/${book._id}/rating`, { rating: newRating });
-      setRating(newRating);
+      const response = await axios.put(`${API}/books/${book._id}/rating`, {
+        rating: newRating,
+      });
+      setAverageRating(response.data.averageRating);
     } catch (error) {
       console.error("Error updating rating:", error);
     }
   };
 
-  // Debounce the updateRating function to limit the number of API requests
   const debouncedUpdateRating = useCallback(debounce(updateRating, 500), []);
 
   const handleRatingChange = (newRating) => {
-    setRating(newRating);
     debouncedUpdateRating(newRating);
   };
 
@@ -53,10 +56,12 @@ const BookCardForShelf = ({ book }) => {
           E. Palich (Author), Frank Hoy (Author)
         </small>
         <p className="book-rating">
-          Rating:{" "}
-          <Rating initialRating={rating} onRatingChange={handleRatingChange} />
+          Average Rating: {averageRating?.toFixed(1)}
+          <Rating
+            initialRating={averageRating}
+            onRatingChange={handleRatingChange}
+          />
         </p>
-
         <p className="book-summary">
           {book.summary.slice(0, 300).concat("...")}{" "}
           <Link to={`/bookshelves/${bookshelfId}/books/${book._id}`}>

@@ -2,6 +2,7 @@ import Book from "../../models/book/index.js";
 import createError from "http-errors";
 import Bookshelf from "../../models/bookshelf/index.js";
 import mongoose from "mongoose";
+import BorrowedBook from "../../models/borrowedBook/index.js";
 
 //==========================================================================
 // Create New book
@@ -211,24 +212,57 @@ export const getBook = async (req, res, next) => {
 };
 
 //==========================================================================
-// Get single book
+// Delete single book
 //==========================================================================
+
 export const deleteBook = async (req, res, next) => {
   const bookId = req.params.id;
 
+  if (!mongoose.Types.ObjectId.isValid(bookId)) {
+    return next(createError(400, "Invalid book ID"));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(bookId).session(session);
 
     if (!book) {
-      return next(createError(400, "Book does not exist!"));
+      await session.abortTransaction();
+      session.endSession();
+      return next(createError(404, "Book does not exist!"));
     }
+
+    // Remove the book from all related Bookshelves
+    await Bookshelf.updateMany(
+      { books: bookId },
+      { $pull: { books: bookId } },
+      { session }
+    );
+
+    // Remove the book from all related BorrowedBooks
+    await BorrowedBook.updateMany(
+      { book: bookId },
+      { $unset: { book: "" } },
+      { session }
+    );
+
+    // Delete the book
+    await Book.findByIdAndDelete(bookId).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
       success: true,
-      result: book,
+      message: "Book deleted successfully",
     });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error deleting book:", error);
+    return next(createError(500, "Server error! Please try again!"));
   }
 };
 
@@ -263,7 +297,6 @@ export const countBooks = async (req, res, next) => {
 export const updateBookRating = async (req, res, next) => {
   const { bookId } = req.params;
   const { rating } = req.body;
-  console.log("rating=", rating);
 
   try {
     const book = await Book.findById(bookId);
@@ -271,12 +304,44 @@ export const updateBookRating = async (req, res, next) => {
       return res.status(404).json({ message: "Book not found" });
     }
 
-    book.ratings = rating; // Update the book's rating
+    book.ratings.push(rating);
     await book.save();
+
+    const averageRating =
+      book.ratings.reduce((acc, rating) => acc + rating, 0) /
+      book.ratings.length;
 
     res.status(200).json({
       success: true,
       book,
+      averageRating,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+//==========================================================================
+// Update book rating
+//==========================================================================
+
+export const getBookRating = async (req, res, next) => {
+  const { bookId } = req.params;
+
+  try {
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    const averageRating =
+      book.ratings.reduce((acc, rating) => acc + rating, 0) /
+      book.ratings.length;
+
+    res.status(200).json({
+      success: true,
+      averageRating,
     });
   } catch (error) {
     console.error(error);

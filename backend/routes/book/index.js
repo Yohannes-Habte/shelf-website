@@ -1,7 +1,9 @@
 import express from "express";
 import {
   createBook,
+  deleteBook,
   getBook,
+  getBookRating,
   getBooks,
   updateBook,
   updateBookRating,
@@ -10,10 +12,11 @@ import {
 const bookRouter = express.Router();
 
 bookRouter.post("/new", createBook);
+bookRouter.put("/:id", updateBook);
 bookRouter.get("/", getBooks);
 bookRouter.get("/:id", getBook);
-bookRouter.put("/:id", updateBook);
-bookRouter.delete("/:id", getBook);
+bookRouter.delete("/:id", deleteBook);
 bookRouter.put('/:bookId/rating', updateBookRating);
+bookRouter.get('/:bookId/rating', getBookRating);
 
 export default bookRouter;

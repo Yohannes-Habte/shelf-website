@@ -14,7 +14,7 @@ import EditBook from "../../forms/updateBook/EditBook";
 const AllBooks = () => {
   // Global state variables
   const dispatch = useDispatch();
-  const { books, loading, error } = useSelector((state) => state.book);
+  const { books } = useSelector((state) => state.book);
 
   // Local state variables
   const [bookId, setBookId] = useState("");
@@ -82,7 +82,10 @@ const AllBooks = () => {
       renderCell: (params) => {
         return (
           <div className="action-wrapper">
-            <MdEditSquare className="edit" onClick={() => setOpenEditBook(true)} />
+            <MdEditSquare
+              className="edit"
+              onClick={() => setOpenEditBook(true)}
+            />
 
             <FaTrashAlt
               onClick={() => {
@@ -111,9 +114,6 @@ const AllBooks = () => {
       toast.error(error.response.data.message);
     }
   };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <section
