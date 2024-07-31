@@ -52,7 +52,7 @@ const AllUsers = () => {
       width: 150,
       renderCell: (params) => (
         <div className="action-wrapper">
-          <Link to={`/donatedBooks/${params.id}`}>
+          <Link to={`/users/${params.id}`}>
             <FaEdit className="edit" />
           </Link>
           <FaTrashAlt

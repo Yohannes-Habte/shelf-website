@@ -34,7 +34,7 @@ const UserDonatedBooks = () => {
       ),
     },
     { field: "title", headerName: "Title", width: 350 },
-    { field: "author", headerName: "Author", width: 300 },
+    { field: "authors", headerName: "Author", width: 300 },
     { field: "language", headerName: "Language", width: 150 },
     { field: "genre", headerName: "Genre", width: 150 },
     { field: "publishedDate", headerName: "Published Date", width: 150 },
@@ -47,20 +47,23 @@ const UserDonatedBooks = () => {
   // Convert donatedBooks to rows for DataGrid
   const rows = donatedBooks.map((book) => ({
     id: book._id,
-    coverImageUrl: book?.coverImageUrl,
-    title: book?.title,
-    author: book?.author,
-    language: book?.language,
-    genre: book?.genre,
-    publishedDate: book?.publishedDate?.slice(0, 10),
-    publisher: book?.publisher?.slice(0, 10),
-    dateDonated: book?.dateDonated?.slice(0, 10),
-    audio: book?.audio,
-    ISBN: book?.ISBN,
+    coverImageUrl: book.coverImageUrl || "NULL",
+    title: book.title || "NULL",
+    authors:
+      book.authors
+        .map((author) => `${author.firstName} ${author.lastName}`)
+        .join(", ") || "NULL",
+    language: book.language || "NULL",
+    genre: book.genre.category || "NULL",
+    publishedDate: new Date(book.publishedDate).toLocaleDateString() || "NULL",
+    publisher: book.publisher || "NULL",
+    dateDonated: new Date(book.dateDonated).toLocaleDateString() || "NULL",
+    audio: book.audio ? "Yes" : "No",
+    ISBN: book.ISBN || "NULL",
   }));
 
   if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error}</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <section className="donated-books-container">
@@ -86,7 +89,7 @@ const UserDonatedBooks = () => {
           columns={columns}
           initialState={{
             pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
+              paginationModel: { page: 0, pageSize: 5 },
             },
           }}
           slots={{ toolbar: GridToolbar }}

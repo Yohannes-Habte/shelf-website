@@ -108,8 +108,8 @@ const UserLocationBookshelf = ({ setOpenUserLocationBookshelf }) => {
         city,
         zipCode,
         street,
-        longitude: userLocation?.longitude,
         latitude: userLocation?.latitude,
+        longitude: userLocation?.longitude,
         openingTime,
         closingTime,
       };

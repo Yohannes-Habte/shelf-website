@@ -183,6 +183,11 @@ export const getUserDonatedBooks = async (req, res, next) => {
       path: "donatedBooks",
       model: "DonatedBook",
       select: "-__v",
+      populate: {
+        path: "genre",
+        model: "Genre",
+        select: "category",
+      },
     });
 
     if (!user) {
@@ -248,7 +253,9 @@ export const getUserBorrowedBooks = async (req, res, next) => {
     const formattedBorrowedBooks = user.borrowedBooks.map((borrowedBook) => ({
       book: {
         title: borrowedBook.book.title,
-        genre: borrowedBook.book.genre ? borrowedBook.book.genre.category : "Unknown",
+        genre: borrowedBook.book.genre
+          ? borrowedBook.book.genre.category
+          : "Unknown",
         language: borrowedBook.book.language,
         publishedDate: borrowedBook.book.publishedDate,
         publisher: borrowedBook.book.publisher,

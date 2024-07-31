@@ -4,35 +4,76 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
 import { FaTrashAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BookForm from "../../forms/book/BookForm";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBooks } from "../../../redux/actions/book/bookActions";
+import { MdEditSquare } from "react-icons/md";
+import EditBook from "../../forms/updateBook/EditBook";
 
 const AllBooks = () => {
+  // Global state variables
+  const dispatch = useDispatch();
+  const { books, loading, error } = useSelector((state) => state.book);
+
+  // Local state variables
   const [bookId, setBookId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [openBook, setOpenBook] = useState(false);
+  const [openEditBook, setOpenEditBook] = useState(false);
 
-  const handleDelete = async (id) => {
-    try {
-      const { data } = await axios.delete(`${API}/books/${id}`);
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-
-    // allUsers();
-  };
+  useEffect(() => {
+    dispatch(fetchBooks());
+  }, [dispatch]);
 
   const columns = [
-    { field: "ISBN", headerName: "ISBN", width: 150 },
+    {
+      field: "coverImageUrl",
+      headerName: "Cover Page",
+      width: 100,
+      renderCell: (params) => (
+        <img
+          src={params.value || "NULL"}
+          alt={params.row.title}
+          style={{ width: "3rem", height: "2rem", objectFit: "contain" }}
+        />
+      ),
+    },
     { field: "title", headerName: "Title", width: 200 },
-    { field: "genre", headerName: "Genre", width: 150 },
-    { field: "publishedDate", headerName: "Published Date", width: 150 },
+    {
+      field: "genre",
+      headerName: "Genre",
+      width: 150,
+      renderCell: (params) => params.row.genre.category,
+    },
+    {
+      field: "authors",
+      headerName: "Authors",
+      width: 300,
+      renderCell: (params) =>
+        params.row.authors
+          .map((author) => `${author.firstName} ${author.lastName}`)
+          .join(", "),
+    },
     { field: "language", headerName: "Language", width: 100 },
+    {
+      field: "publishedDate",
+      headerName: "Published Date",
+      width: 150,
+      renderCell: (params) =>
+        new Date(params.row.publishedDate).toLocaleDateString(),
+    },
     { field: "publisher", headerName: "Publisher", width: 150 },
-    { field: "coverImageUrl", headerName: "Cover", width: 150 },
-    { field: "summary", headerName: "Summary", width: 150 },
-    { field: "shelfId", headerName: "Bookshelf", width: 150 },
+    { field: "summary", headerName: "Summary", width: 300 },
+    { field: "audio", headerName: "Audio", width: 100 },
+    {
+      field: "borrowedTimes",
+      headerName: "Borrowed times",
+      width: 150,
+      renderCell: (params) => params.row.borrowedTimes.length,
+    },
+    { field: "status", headerName: "Status", width: 150 },
+    { field: "ISBN", headerName: "ISBN", width: 150 },
 
     {
       field: "action",
@@ -41,8 +82,13 @@ const AllBooks = () => {
       renderCell: (params) => {
         return (
           <div className="action-wrapper">
+            <MdEditSquare className="edit" onClick={() => setOpenEditBook(true)} />
+
             <FaTrashAlt
-              onClick={() => setBookId(params.id) || setConfirmDeletion(true)}
+              onClick={() => {
+                setBookId(params.id);
+                setConfirmDeletion(true);
+              }}
               className="delete"
             />
           </div>
@@ -51,13 +97,30 @@ const AllBooks = () => {
     },
   ];
 
-  const rows = [];
+  const rows = books.map((book) => ({
+    ...book,
+    id: book._id,
+  }));
+
+  const handleDelete = async (id) => {
+    try {
+      const { data } = await axios.delete(`${API}/books/${id}`);
+      toast.success(data.message);
+      dispatch(fetchBooks()); // Re-fetch books after deletion
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <section
       className="books-table-container"
       style={{ height: "400px", width: "100%" }}
     >
-      <h3 className="books-table-title"> List of Books </h3>
+      <h3 className="books-table-title">List of Books</h3>
 
       <aside className="add-new-book">
         <h3 className="add-new-book-title">Add New Genre</h3>
@@ -67,30 +130,23 @@ const AllBooks = () => {
       </aside>
 
       <DataGrid
-        // Rows
         rows={rows}
-        // Columns
         columns={columns}
-        // Initial state
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        // Create search bar
         slots={{ toolbar: GridToolbar }}
-        // Search a specific user
         slotProps={{
           toolbar: {
             showQuickFilter: true,
             quickFilterProps: { debounceMs: 500 },
           },
         }}
-        // Page size optons
         pageSizeOptions={[5, 10]}
         checkboxSelection
         disableRowSelectionOnClick
-        //
       />
 
       {confirmDeletion && (
@@ -103,26 +159,28 @@ const AllBooks = () => {
           </span>
 
           <h3 className="you-want-delete-user">
-            Are you sure you want delete this service?
+            Are you sure you want to delete this book?
           </h3>
           <aside className="cancel-or-confirm-delete">
             <p
-              className={`cancel-delete`}
+              className="cancel-delete"
               onClick={() => setConfirmDeletion(false)}
             >
-              cancel
+              Cancel
             </p>
             <h3
-              className={`confirm-delete`}
+              className="confirm-delete"
               onClick={() => setConfirmDeletion(false) || handleDelete(bookId)}
             >
-              confirm
+              Confirm
             </h3>
           </aside>
         </article>
       )}
 
       {openBook && <BookForm setOpenBook={setOpenBook} />}
+
+      {openEditBook && <EditBook setOpenEditBook={setOpenEditBook} />}
     </section>
   );
 };

@@ -115,7 +115,11 @@ export const getBooks = async (req, res, next) => {
       filter.language = language;
     }
 
-    const books = await Book.find(filter);
+    const books = await Book.find(filter).populate({
+      path: "genre",
+      model: "Genre",
+      select: "category",
+    });
 
     if (books.length === 0) {
       return next(createError(404, "No books found!"));

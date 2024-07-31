@@ -1,16 +1,25 @@
-import { useState } from "react";
+// src/components/AllBookshelves/AllBookshelves.js
+import { useEffect, useState } from "react";
 import "./AllBookshelves.scss";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { API } from "../../../utils/security/secreteKey";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllBookshelves } from "../../../redux/actions/bookshelf/bookshelfAction";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdEditSquare } from "react-icons/md";
 import ClickOnMapBookshelf from "../../forms/bookshelf/clickMapOption/ClickOnMapBookshelf";
 import UserLocationBookshelf from "../../forms/bookshelf/userLocationOption/UserLocationBookshelf";
 import SearchLocationBookshelf from "../../forms/bookshelf/searchLocationOption/SearchLocationBookshelf";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { API } from "../../../utils/security/secreteKey";
 
 const AllBookshelves = () => {
+  // Global state variables
+  const dispatch = useDispatch();
+  const { bookshelves, loading, error } = useSelector(
+    (state) => state.bookshelf
+  );
+
   // Local state variable
   const [bookshelfId, setBookshelfId] = useState("");
   const [confirmDeletion, setConfirmDeletion] = useState(false);
@@ -20,66 +29,112 @@ const AllBookshelves = () => {
   const [openSearchLocationBookshelf, setOpenSearchLocationBookshelf] =
     useState(false);
 
-  const handleDelete = async (id) => {
-    try {
-      const { data } = await axios.delete(`${API}/bookshelves/${id}`);
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-
-    // allUsers();
-  };
+  useEffect(() => {
+    dispatch(fetchAllBookshelves());
+  }, [dispatch]);
 
   const columns = [
-    { field: "image", headerName: "Photo", width: 150 },
-    { field: "name", headerName: "Name", width: 150 },
-    { field: "location", headerName: "Location", width: 200 },
-    { field: "street", headerName: "Address", width: 200 },
+    { field: "barcode", headerName: "Barcode", width: 250 },
+    {
+      field: "image",
+      headerName: "Photo",
+      width: 70,
+      renderCell: (params) => (
+        <img
+          src={params.value[0] || "NULL"}
+          alt={params.row.name}
+          style={{ width: "3rem", height: "2rem", objectFit: "contain" }}
+        />
+      ),
+    },
+    { field: "name", headerName: "Name", width: 200 },
+    {
+      field: "location",
+      headerName: "Location",
+      width: 450,
+      renderCell: (params) => (
+        <span>{`Lat: ${params.value.coordinates[0]}, Lon: ${params.value.coordinates[1]}`}</span>
+      ),
+    },
+    { field: "street", headerName: "Street", width: 200 },
     { field: "zipCode", headerName: "Zip Code", width: 100 },
-    { field: "city", headerName: "City", width: 150 },
-    { field: "state", headerName: "State", width: 150 },
-    { field: "country", headerName: "Country", width: 150 },
-    { field: "openingHours", headerName: "Opening Hours", width: 150 },
+    { field: "city", headerName: "City", width: 100 },
+    { field: "state", headerName: "State", width: 100 },
+    { field: "country", headerName: "Country", width: 100 },
+    { field: "openingTime", headerName: "Opening Time", width: 150 },
+    { field: "closingTime", headerName: "Closing Time", width: 150 },
+    {
+      field: "books",
+      headerName: "Books",
+      width: 150,
+      renderCell: (params) => <span>{params.value.length}</span>,
+    },
+    {
+      field: "donatedBooks",
+      headerName: "Donated Books",
+      width: 150,
+      renderCell: (params) => <span>{params.value.length}</span>,
+    },
+    {
+      field: "borrowedBooks",
+      headerName: "Borrowed Books",
+      width: 150,
+      renderCell: (params) => <span>{params.value.length}</span>,
+    },
     {
       field: "action",
       headerName: "Action",
       width: 150,
-      renderCell: (params) => {
-        return (
-          <div className="action-wrapper">
-            <MdEditSquare
-              className="edit"
-              onClick={() => setOpenClickMapBookshelf(true)}
-            />
+      renderCell: (params) => (
+        <div className="action-wrapper">
+          <MdEditSquare
+            className="edit"
+            onClick={() => setOpenClickMapBookshelf(true)}
+          />
 
-            <FaTrashAlt
-              onClick={() =>
-                setBookshelfId(params.id) || setConfirmDeletion(true)
-              }
-              className="delete"
-            />
-          </div>
-        );
-      },
+          <FaTrashAlt
+            onClick={() => {
+              setBookshelfId(params.id);
+              setConfirmDeletion(true);
+            }}
+            className="delete"
+          />
+        </div>
+      ),
     },
   ];
 
-  const rows = [
-    {
-      id: "sfs13",
-      barcode: "bookshelf",
-      image: "photo",
-      name: "start bookshelf",
-      location: "lat: 2, lon: 34",
-      street: "rabenstr. 50z",
-      zipCode: "25421",
-      city: "Pinneberg",
-      state: "Schleswig-holstein",
-      country: "Germany",
-      openingHours: "8:00 - 18:00",
-    },
-  ];
+  const rows = bookshelves.map((bookshelf) => ({
+    id: bookshelf._id,
+    barcode: bookshelf.barcode,
+    image: bookshelf.image,
+    name: bookshelf.name,
+    location: bookshelf.location,
+    street: bookshelf.street,
+    zipCode: bookshelf.zipCode,
+    city: bookshelf.city,
+    state: bookshelf.state,
+    country: bookshelf.country,
+    openingTime: bookshelf.openingTime,
+    closingTime: bookshelf.closingTime,
+    books: bookshelf.books,
+    donatedBooks: bookshelf.donatedBooks,
+    borrowedBooks: bookshelf.borrowedBooks,
+  }));
+
+  const handleDelete = async (id) => {
+    try {
+      const { data } = await axios.delete(`${API}/bookshelves/${id}`);
+      toast.success(data.message);
+      dispatch(fetchAllBookshelves());
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <section
       className="bookshelves-table-container"
@@ -115,30 +170,23 @@ const AllBookshelves = () => {
         </div>
       </aside>
       <DataGrid
-        // Rows
         rows={rows}
-        // Columns
         columns={columns}
-        // Initial state
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        // Create search bar
         slots={{ toolbar: GridToolbar }}
-        // Search a specific user
         slotProps={{
           toolbar: {
             showQuickFilter: true,
             quickFilterProps: { debounceMs: 500 },
           },
         }}
-        // Page size optons
         pageSizeOptions={[5, 10]}
         checkboxSelection
         disableRowSelectionOnClick
-        //
       />
 
       {confirmDeletion && (
@@ -162,9 +210,10 @@ const AllBookshelves = () => {
             </p>
             <h3
               className={`confirm-delete`}
-              onClick={() =>
-                setConfirmDeletion(false) || handleDelete(bookshelfId)
-              }
+              onClick={() => {
+                setConfirmDeletion(false);
+                handleDelete(bookshelfId);
+              }}
             >
               confirm
             </h3>
