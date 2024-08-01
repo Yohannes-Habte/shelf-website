@@ -202,6 +202,10 @@ export const deleteBorrowedBook = async (req, res) => {
 export const countBorrowedBooks = async (req, res, next) => {
   try {
     const counts = await BorrowedBook.countDocuments();
+    if (counts < 0) {
+      return next(createError(500, "Invalid count of borrowed books."));
+    }
+
     return res.status(200).json({
       success: true,
       result: counts,

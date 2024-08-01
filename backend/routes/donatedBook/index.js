@@ -15,6 +15,6 @@ donatedBookRouter.get("/", getDonatedBooks);
 donatedBookRouter.get("/:id", getDonatedBook);
 donatedBookRouter.put("/:id", updateDonatedBook);
 donatedBookRouter.delete("/:id", deleteDonatedBook);
-donatedBookRouter.get("/count/donated/books", countDonatedBooks);
+donatedBookRouter.get("/count/total", countDonatedBooks);
 
 export default donatedBookRouter;

@@ -11,74 +11,80 @@ const UsersChart = () => {
   const data = [
     {
       month: "January",
-      baptism: 1,
-      marriage: 1,
-      prayer: 2,
+      books: 14,
+      donatedBooks: 15,
+      borrowedBook: 2,
     },
     {
       month: "February",
-      baptism: 3,
-      marriage: 0,
-      prayer: 1,
+      books: 23,
+      donatedBooks: 16,
+      borrowedBook: 2,
     },
     {
       month: "March",
-      baptism: 1,
-      marriage: 1,
-      prayer: 2,
+      books: 34,
+      donatedBooks: 12,
+      borrowedBook: 2,
     },
     {
       month: "April",
-      baptism: 1,
-      marriage: 0,
-      prayer: 0,
+      books: 13,
+      donatedBooks: 12,
+      borrowedBook: 21,
+    },
+    {
+      month: "May",
+      books: 31,
+      donatedBooks: 13,
+      borrowedBook: 2,
     },
     {
       month: "June",
-      baptism: 1,
-      marriage: 0,
-      prayer: 0,
+      books: 14,
+      donatedBooks: 14,
+      borrowedBook: 5,
     },
     {
       month: "July",
-      baptism: 2,
-      marriage: 1,
-      prayer: 2,
+      books: 31,
+      donatedBooks: 15,
+      borrowedBook: 7,
     },
 
     {
       month: "August",
-      baptism: 1,
-      marriage: 0,
-      prayer: 0,
+      books: 41,
+      donatedBooks: 31,
+      borrowedBook: 12,
     },
 
     {
       month: "September",
-      baptism: 0,
-      marriage: 1,
-      prayer: 1,
+      books: 51,
+      donatedBooks: 31,
+      borrowedBook: 16,
     },
 
     {
       month: "October",
-      baptism: 1,
-      marriage: 1,
-      prayer: 1,
+      books: 31,
+      donatedBooks: 21,
+      borrowedBook: 20,
     },
 
     {
       month: "November",
-      baptism: 3,
-      marriage: 0,
-      prayer: 2,
+      books: 61,
+      donatedBooks: 21,
+      borrowedBook: 12,
     },
 
     {
       month: "December",
-      baptism: 2,
-      marriage: 0,
-      prayer: 1,
+      books: 90,
+      donatedBooks: 41,
+      borrowedBook: 20,
     },
   ];
   return (
@@ -102,9 +108,9 @@ const UsersChart = () => {
             cursor={{ fill: "none" }}
           />
 
-          <Bar dataKey="baptism" fill="#8884d8" />
-          <Bar dataKey="marriage" fill="#82ca9d" />
-          <Bar dataKey="prayer" fill="#82ca9d" />
+          <Bar dataKey="books" fill="#8884d8" />
+          <Bar dataKey="donatedBooks" fill="#82ca9d" />
+          <Bar dataKey="borrowedBook" fill="#a2d2ff" />
         </BarChart>
       </ResponsiveContainer>
     </section>

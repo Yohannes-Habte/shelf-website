@@ -80,7 +80,7 @@ export const fetchBorrowedBooks = () => async (dispatch) => {
 export const countBorrowedBooks = () => async (dispatch) => {
   dispatch(countBorrowedBooksStart());
   try {
-    const response = await axios.get(`${API}/borrowedBooks/count`);
+    const response = await axios.get(`${API}/borrowedBooks/count/total`);
     dispatch(countBorrowedBooksSuccess(response.data.result));
   } catch (error) {
     dispatch(countBorrowedBooksFailure(error.message));

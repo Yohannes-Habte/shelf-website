@@ -13,6 +13,6 @@ borrowedBookRouter.post("/new/:id", createBorrowedBook);
 borrowedBookRouter.get("/", getBorrowedBooks);
 borrowedBookRouter.get("/:id", getBorrowedBook);
 borrowedBookRouter.delete("/:id", deleteBorrowedBook);
-borrowedBookRouter.get("/count/all", countBorrowedBooks);
+borrowedBookRouter.get("/count/total", countBorrowedBooks);
 
 export default borrowedBookRouter;

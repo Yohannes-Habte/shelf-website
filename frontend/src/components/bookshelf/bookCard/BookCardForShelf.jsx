@@ -58,7 +58,7 @@ const BookCardForShelf = ({ book }) => {
         <p className="book-rating">
           Average Rating: {averageRating?.toFixed(1)}
           <Rating
-            initialRating={averageRating}
+            initialRating={averageRating}  // Pass the averageRating to Rating component
             onRatingChange={handleRatingChange}
           />
         </p>

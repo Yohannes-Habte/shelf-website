@@ -1,0 +1,98 @@
+@import "../../../styles/Variables.scss";
+@import "../../../styles/Mixins.scss";
+
+$primary-color: #007bff;
+$border-color: #ced4da;
+$background-color: #f8f9fa;
+$border-radius: 4px;
+$padding: 12px; // Increased padding for better spacing
+$margin-bottom: 1rem;
+$icon-size: 1.5rem;
+$icon-spacing: 1rem; // Increased spacing for better separation
+$input-height: 2.5rem; // Height of the input field
+
+.bookshelf-search-form {
+  background-color: $background-color;
+  border-radius: $border-radius;
+  padding: $padding;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: row; 
+  gap: 0.2rem;
+
+  .input-container {
+    position: relative; 
+
+    .input-icon {
+      position: absolute; 
+      left: 0.75rem; 
+      top: 50%;
+      transform: translateY(-50%); 
+      color: $icon;
+      font-size: $icon-size;
+      pointer-events: none;
+    }
+
+    .input-field {
+      padding-left: calc(#{$icon-size} + #{$icon-spacing}); 
+      height: $input-height; 
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      font-size: 1rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.3s ease;
+      width: 100%; 
+
+      &:focus {
+        border-color: $primary-color;
+      }
+    }
+  }
+
+  .input-label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: $primary-color;
+    display: block;
+  }
+
+ 
+  .bookshelf-search-btn {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 0.50rem 1.5rem;
+    border-radius: $border-radius;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  
+  .bookshelf-reset-btn {
+    padding: 0.50rem 1.5rem;
+    font-size: 1rem;
+    color: #007bff;
+    background-color: transparent;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    &:hover {
+      background-color: #007bff;
+      color: #fff;
+    }
+  }
+}

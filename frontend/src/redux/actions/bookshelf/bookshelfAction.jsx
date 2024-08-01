@@ -36,7 +36,7 @@ export const postBookshelf = (bookshelfData) => async (dispatch) => {
 export const fetchBookshelf = (id) => async (dispatch) => {
   dispatch(fetchBookshelfStart());
   try {
-    const {data} = await axios.get(`${API}/bookshelves/${id}`);
+    const { data } = await axios.get(`${API}/bookshelves/${id}`);
     dispatch(fetchBookshelfSuccess(data.result));
   } catch (error) {
     dispatch(fetchBookshelfFailure(error.message));
@@ -44,12 +44,16 @@ export const fetchBookshelf = (id) => async (dispatch) => {
 };
 
 // Fetch all bookshelves
-export const fetchAllBookshelves = () => async (dispatch) => {
+export const fetchAllBookshelves = (searchParams) => async (dispatch) => {
   dispatch(fetchAllBookshelvesStart());
   try {
-    const {data} = await axios.get(`${API}/bookshelves`);
+    // Check if searchParams is properly formatted
+    console.log('Search Params:', searchParams);
+
+    const { data } = await axios.get(`${API}/bookshelves`, { params: searchParams });
     dispatch(fetchAllBookshelvesSuccess(data.result));
   } catch (error) {
+    console.error('Error fetching bookshelves:', error);
     dispatch(fetchAllBookshelvesFailure(error.message));
   }
 };
@@ -80,8 +84,8 @@ export const deleteBookshelf = (id) => async (dispatch) => {
 export const countBookshelves = () => async (dispatch) => {
   dispatch(countBookshelvesStart());
   try {
-    const response = await axios.get(`${API}/bookshelves/count`);
-    dispatch(countBookshelvesSuccess(response.data));
+    const response = await axios.get(`${API}/bookshelves/count/total`);
+    dispatch(countBookshelvesSuccess(response.data.result));
   } catch (error) {
     dispatch(countBookshelvesFailure(error.message));
   }

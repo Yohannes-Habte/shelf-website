@@ -47,12 +47,14 @@ const bookSlice = createSlice({
 
     // Get all books
     fetchBooksStart: requestStart,
-    fetchBooksSuccess: (state, action) => requestSuccess(state, action, "books"),
+    fetchBooksSuccess: (state, action) =>
+      requestSuccess(state, action, "books"),
     fetchBooksFailure: requestFailure,
 
     // Count all books
     countBooksStart: requestStart,
-    countBooksSuccess: (state, action) => requestSuccess(state, action, "count"),
+    countBooksSuccess: (state, action) =>
+      requestSuccess(state, action, "count"),
     countBooksFailure: requestFailure,
 
     // Clear errors

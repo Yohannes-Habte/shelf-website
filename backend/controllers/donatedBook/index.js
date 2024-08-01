@@ -298,10 +298,6 @@ export const countDonatedBooks = async (req, res, next) => {
       return next(createError(500, "Invalid count of donated books."));
     }
 
-    if (counts === 0) {
-      return next(createError(500, "No donated books found."));
-    }
-
     return res.status(200).json({
       success: true,
       result: counts,

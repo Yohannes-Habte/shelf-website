@@ -254,7 +254,6 @@ const BookForm = ({ setOpenBook }) => {
                 name="publisher"
                 value={book.publisher}
                 onChange={handleChange}
-                required
                 placeholder="Publisher Name"
                 className="input-field"
               />
@@ -271,7 +270,6 @@ const BookForm = ({ setOpenBook }) => {
                 type="file"
                 name="coverImageUrl"
                 onChange={handleChange}
-                required
                 placeholder="Book Cover Image"
                 className="input-field"
               />

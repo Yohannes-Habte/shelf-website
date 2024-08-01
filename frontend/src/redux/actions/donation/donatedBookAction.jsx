@@ -87,7 +87,7 @@ export const fetchDonatedBooks = () => async (dispatch) => {
 export const countDonatedBooks = () => async (dispatch) => {
   dispatch(countDonatedBooksStart());
   try {
-    const response = await axios.get(`${API}/donatedBooks/count`);
+    const response = await axios.get(`${API}/donatedBooks/count/total`);
     dispatch(countDonatedBooksSuccess(response.data.result));
   } catch (error) {
     dispatch(countDonatedBooksFailure(error.message));

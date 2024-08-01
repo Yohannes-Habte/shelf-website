@@ -49,8 +49,6 @@ export const createBook = async (req, res, next) => {
     bookshelf.books.push(savedBook._id);
     await bookshelf.save();
 
-    console.log("save bookshelf=", await bookshelf.save());
-
     res.status(201).json({
       success: true,
       message: "Book created and added to the bookshelf successfully",
@@ -272,7 +270,7 @@ export const deleteBook = async (req, res, next) => {
 
 export const countBooks = async (req, res, next) => {
   try {
-    const count = await Book.countDocuments({});
+    const count = await Book.countDocuments();
 
     if (count === 0) {
       return next(createError(404, "No books found."));
@@ -297,6 +295,11 @@ export const countBooks = async (req, res, next) => {
 export const updateBookRating = async (req, res, next) => {
   const { bookId } = req.params;
   const { rating } = req.body;
+
+  // Ensure rating is valid
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
+  }
 
   try {
     const book = await Book.findById(bookId);
@@ -336,8 +339,10 @@ export const getBookRating = async (req, res, next) => {
     }
 
     const averageRating =
-      book.ratings.reduce((acc, rating) => acc + rating, 0) /
-      book.ratings.length;
+      book.ratings.length > 0
+        ? book.ratings.reduce((acc, rating) => acc + rating, 0) /
+          book.ratings.length
+        : 0;
 
     res.status(200).json({
       success: true,

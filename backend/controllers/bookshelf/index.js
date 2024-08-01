@@ -218,37 +218,43 @@ export const updateBookshelf = async (req, res, next) => {
 //==========================================================================
 // Get all bookshelves
 //==========================================================================
+
 export const getBookshelves = async (req, res, next) => {
   try {
-    const { search } = req.query;
+    const { country, state, city, name } = req.query;
 
     let query = {};
 
-    if (search) {
-      // If search parameter is provided, construct the query with $or conditions
-      query = {
-        $or: [
-          { name: new RegExp(search, "i") },
-          { country: new RegExp(search, "i") },
-          { state: new RegExp(search, "i") },
-          { city: new RegExp(search, "i") },
-        ],
-      };
+    if (country) {
+      query.country = new RegExp(country, "i");
+    }
+    if (state) {
+      query.state = new RegExp(state, "i");
+    }
+    if (city) {
+      query.city = new RegExp(city, "i");
+    }
+    if (name) {
+      query.name = new RegExp(`^${name}$`, "i");
     }
 
-    // Find bookshelves based on the constructed query or return all if no query
     const bookshelves = await Bookshelf.find(query);
 
-    if (!bookshelves || bookshelves.length === 0) {
-      return next(createError(400, "Bookshelves not found!"));
+    // If no bookshelves found, return a 404 response
+    if (bookshelves.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No bookshelves found." });
     }
 
+    // Return the fetched bookshelves
     return res.status(200).json({
       success: true,
       result: bookshelves,
     });
   } catch (error) {
-    return next(createError(500, "Server error! Please try again!"));
+
+    return next(createError(500, "Server error! Please try again later."));
   }
 };
 
@@ -333,7 +339,6 @@ export const deleteBookshelf = async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    console.error("Error deleting bookshelf:", error);
     return next(createError(500, "Internal server error"));
   }
 };
@@ -536,6 +541,25 @@ export const countShelvesBorrowedBooks = async (req, res, next) => {
     res.status(200).json({
       success: true,
       result: borrowedBookCount,
+    });
+  } catch (error) {
+    next(createError(400, "Server error! Please try again!"));
+  }
+};
+
+
+
+//==========================================================================
+// Total Number of bookshelves
+//==========================================================================
+
+export const countBookshelves = async (req, res, next) => {
+  try {
+    const bookshelvesCount = await Bookshelf.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      result: bookshelvesCount,
     });
   } catch (error) {
     next(createError(400, "Server error! Please try again!"));
