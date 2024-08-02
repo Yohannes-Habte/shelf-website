@@ -157,6 +157,10 @@ export const updateDonatedBook = async (req, res, next) => {
       return next(createError(404, "Donated book not found."));
     }
 
+    // Store previous bookshelfId and userId
+    const previousBookshelfId = existingBook.bookshelfId;
+    const previousUserId = existingBook.userId;
+
     // Update the book with new data
     const updatedBook = await DonatedBook.findByIdAndUpdate(
       donatedBookId,
@@ -170,10 +174,20 @@ export const updateDonatedBook = async (req, res, next) => {
 
     // Handle Bookshelf update if bookshelfId is provided
     if (bookshelfId && mongoose.Types.ObjectId.isValid(bookshelfId)) {
+      if (
+        previousBookshelfId &&
+        previousBookshelfId.toString() !== bookshelfId
+      ) {
+        // Remove the book from the previous bookshelf
+        await Bookshelf.findByIdAndUpdate(previousBookshelfId, {
+          $pull: { donatedBookshelves: donatedBookId },
+        });
+      }
+
       // Add the book to the new bookshelf
       const newBookshelf = await Bookshelf.findByIdAndUpdate(
         bookshelfId,
-        { $push: { donatedBookshelves: donatedBookId } },
+        { $addToSet: { donatedBookshelves: donatedBookId } },
         { new: true }
       );
 
@@ -184,10 +198,17 @@ export const updateDonatedBook = async (req, res, next) => {
 
     // Handle User update if userId is provided
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      if (previousUserId && previousUserId.toString() !== userId) {
+        // Remove the book from the previous user
+        await User.findByIdAndUpdate(previousUserId, {
+          $pull: { donatedBooks: donatedBookId },
+        });
+      }
+
       // Add the book to the new user
       const newUser = await User.findByIdAndUpdate(
         userId,
-        { $push: { donatedBooks: donatedBookId } },
+        { $addToSet: { donatedBooks: donatedBookId } },
         { new: true }
       );
 
@@ -243,21 +264,6 @@ export const deleteDonatedBook = async (req, res) => {
       await session.abortTransaction();
       session.endSession();
       return res.status(404).json({ message: "User not found" });
-    }
-
-    // Remove from donatedBookshelves in User model
-    const userDonatedBookshelf = await User.findOneAndUpdate(
-      { donatedBookshelves: bookId },
-      { $pull: { donatedBookshelves: bookId } },
-      { new: true, session }
-    );
-
-    if (!userDonatedBookshelf) {
-      await session.abortTransaction();
-      session.endSession();
-      return res
-        .status(404)
-        .json({ message: "User donated bookshelf not found" });
     }
 
     // Remove from donatedBooks in Bookshelf model

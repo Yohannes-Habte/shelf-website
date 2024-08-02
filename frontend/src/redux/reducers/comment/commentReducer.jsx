@@ -4,22 +4,23 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   comment: null,
   comments: [],
+  count: 0,
   error: null,
   loading: false,
 };
 
-// Helper functions for reducing redundancy
-const requestStart = (state) => {
+// Helper functions
+const startRequest = (state) => {
   state.loading = true;
-  state.error = null; // Clear any previous error on a new request start
+  state.error = null;
 };
 
-const requestSuccess = (state, action, key) => {
+const successRequest = (state, action, key) => {
   state[key] = action.payload;
   state.loading = false;
 };
 
-const requestFailure = (state, action) => {
+const failureRequest = (state, action) => {
   state.error = action.payload;
   state.loading = false;
 };
@@ -30,28 +31,38 @@ const commentSlice = createSlice({
   initialState,
   reducers: {
     // Post comment
-    commentPostStart: requestStart,
+    commentPostStart: startRequest,
     commentPostSuccess: (state, action) =>
-      requestSuccess(state, action, "comment"),
-    commentPostFailure: requestFailure,
+      successRequest(state, action, "comment"),
+    commentPostFailure: failureRequest,
 
     // Fetch single comment
-    fetchCommentStart: requestStart,
+    fetchCommentStart: startRequest,
     fetchCommentSuccess: (state, action) =>
-      requestSuccess(state, action, "comment"),
-    fetchCommentFailure: requestFailure,
+      successRequest(state, action, "comment"),
+    fetchCommentFailure: failureRequest,
 
     // Delete comment
-    commentDeleteStart: requestStart,
+    commentDeleteStart: startRequest,
     commentDeleteSuccess: (state, action) =>
-      requestSuccess(state, action, "comment"),
-    commentDeleteFailure: requestFailure,
+      successRequest(state, action, "comment"),
+    commentDeleteFailure: failureRequest,
 
     // Get all comments
-    commentsGetStart: requestStart,
-    commentsGetSuccess: (state, action) =>
-      requestSuccess(state, action, "comments"),
-    commentsGetFailure: requestFailure,
+    commentsGetStart: startRequest,
+    commentsGetSuccess: (state, action) => {
+      state.comments = action.payload;
+      state.loading = false;
+    },
+    commentsGetFailure: failureRequest,
+
+    // Count comments
+    countCommentsStart: startRequest,
+    countCommentsSuccess: (state, action) => {
+      state.count = action.payload;
+      state.loading = false;
+    },
+    countCommentsFailure: failureRequest,
 
     // Clear errors
     clearErrors: (state) => {
@@ -77,6 +88,10 @@ export const {
   commentsGetStart,
   commentsGetSuccess,
   commentsGetFailure,
+
+  countCommentsStart,
+  countCommentsSuccess,
+  countCommentsFailure,
 
   clearErrors,
 } = commentSlice.actions;

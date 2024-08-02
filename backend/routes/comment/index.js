@@ -12,10 +12,12 @@ const commentRouter = express.Router();
 
 // comment routes
 commentRouter.post("/:id/new", createComment);
-commentRouter.get("/:id", getComment);
-commentRouter.delete("/:userId/:commentId", deleteComment);
 commentRouter.get("/", getAllComments);
-commentRouter.get("/count/all/comments", countComments);
+commentRouter.get("/:id", getComment);
+commentRouter.delete("/:commentId", deleteComment);
+commentRouter.get("/count/total", countComments);
+
+
 
 // Export comment router
 export default commentRouter;

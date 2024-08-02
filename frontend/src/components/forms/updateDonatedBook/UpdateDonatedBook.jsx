@@ -22,11 +22,12 @@ import {
   FaBarcode,
   FaVolumeUp,
 } from "react-icons/fa";
-import { updateDonatedBook } from "../../../redux/actions/donation/donatedBookAction";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
+const UpdateDonatedBook = () => {
+  const { bookId } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     authors: [{ firstName: "", lastName: "" }],
@@ -36,29 +37,39 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     language: "",
     publishedDate: "",
     publisher: "",
-    coverImageUrl: null,
+    coverImageUrl: "",
     summary: "",
     ISBN: "",
     audio: false,
   });
+  const [bookshelves, setBookshelves] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [book, setBook] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const {
-    title,
-    authors,
-    bookshelfId,
-    userId,
-    genre,
-    language,
-    publishedDate,
-    publisher,
-    coverImageUrl,
-    summary,
-    ISBN,
-    audio,
-  } = formData;
+  // Fetch book details
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const { data } = await axios.get(`${API}/donatedBooks/${bookId}`);
+        setBook(data.result);
+        setLoading(false);
+      } catch (error) {
+        toast.error("Error fetching book details");
+      }
+    };
+    fetchBook();
+  }, [bookId]);
 
   useEffect(() => {
     if (book) {
+      const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toISOString().split("T")[0]; // Formats as yyyy-MM-dd
+      };
+
       setFormData({
         title: book.title || "",
         authors: book.authors || [{ firstName: "", lastName: "" }],
@@ -66,9 +77,9 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
         userId: book.userId || "",
         genre: book.genre || "",
         language: book.language || "",
-        publishedDate: book.publishedDate || "",
+        publishedDate: formatDate(book.publishedDate) || "",
         publisher: book.publisher || "",
-        coverImageUrl: "",
+        coverImageUrl: book.coverImageUrl || "",
         summary: book.summary || "",
         ISBN: book.ISBN || "",
         audio: book.audio || false,
@@ -76,10 +87,9 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     }
   }, [book]);
 
-  const [bookshelves, setBookshelves] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [genres, setGenres] = useState([]);
 
+
+  // Fetch bookshelves
   useEffect(() => {
     const fetchBookshelves = async () => {
       try {
@@ -92,6 +102,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     fetchBookshelves();
   }, []);
 
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -104,6 +115,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     fetchUsers();
   }, []);
 
+  // Fetch genres
   useEffect(() => {
     const fetchGenres = async () => {
       try {
@@ -127,7 +139,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
 
   const handleAuthorsChange = (index, event) => {
     const { name, value } = event.target;
-    const updatedAuthors = [...authors];
+    const updatedAuthors = [...formData.authors];
     updatedAuthors[index] = {
       ...updatedAuthors[index],
       [name]: value,
@@ -165,8 +177,8 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToUpload = new FormData();
-    if (coverImageUrl) {
-      formDataToUpload.append("file", coverImageUrl);
+    if (formData.coverImageUrl) {
+      formDataToUpload.append("file", formData.coverImageUrl);
       formDataToUpload.append("cloud_name", cloud_name);
       formDataToUpload.append("upload_preset", upload_preset);
     }
@@ -174,30 +186,36 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     let imageUrl = "";
 
     try {
-      if (coverImageUrl) {
+      if (formData.coverImageUrl) {
         const response = await axios.post(cloud_URL, formDataToUpload);
         imageUrl = response.data.secure_url;
       }
 
-      const updateBook = {
-        title,
-        authors,
-        bookshelfId,
-        userId,
-        genre,
-        language,
-        publishedDate,
-        publisher,
-        coverImageUrl: imageUrl || formData.coverImageUrl,
-        summary,
-        ISBN,
-        audio,
+      const formatDateForServer = (dateString) => {
+        return dateString ? new Date(dateString).toISOString() : ""; // Convert to ISO format
       };
 
-      await dispatch(updateDonatedBook(bookId, updateBook));
+      const updateBook = {
+        title: formData.title,
+        authors: formData.authors,
+        bookshelfId: formData.bookshelfId,
+        userId: formData.userId,
+        genre: formData.genre,
+        language: formData.language,
+        publishedDate: formatDateForServer(formData.publishedDate),
+        publisher: formData.publisher,
+        coverImageUrl: imageUrl || formData.coverImageUrl,
+        summary: formData.summary,
+        ISBN: formData.ISBN,
+        audio: formData.audio,
+      };
 
+      const { data } = await axios.put(
+        `${API}/donatedBooks/${bookId}`,
+        updateBook
+      );
+      toast.success(data.success);
       handleReset();
-      toast.success("Book updated successfully!");
       navigate("/admin/dashboard");
     } catch (error) {
       console.error("Error updating book:", error);
@@ -205,11 +223,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
     }
   };
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
+  if (loading) return <p>Loading...</p>;
 
   return (
     <article className="update-donated-book-modal">
@@ -222,7 +236,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
             <input
               type="text"
               name="title"
-              value={title}
+              value={formData.title}
               onChange={handleChange}
               placeholder="Title"
               className="input-field"
@@ -235,7 +249,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
 
           {/* Authors */}
           <div className="author-input-wrapper">
-            {authors.map((author, index) => (
+            {formData.authors.map((author, index) => (
               <div key={index} className="author-input-container">
                 <div className="input-container">
                   <FaUser className="input-icon" />
@@ -284,7 +298,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <FaList className="input-icon" />
               <select
                 name="bookshelfId"
-                value={bookshelfId}
+                value={formData.bookshelfId}
                 onChange={handleChange}
                 className="input-field"
               >
@@ -303,7 +317,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <FaUserTag className="input-icon" />
               <select
                 name="userId"
-                value={userId}
+                value={formData.userId}
                 onChange={handleChange}
                 className="input-field"
               >
@@ -322,7 +336,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <FaTags className="input-icon" />
               <select
                 name="genre"
-                value={genre}
+                value={formData.genre}
                 onChange={handleChange}
                 className="input-field"
               >
@@ -333,7 +347,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
                   </option>
                 ))}
               </select>
-            
+
               <span className="input-highlight"></span>
             </div>
 
@@ -342,7 +356,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <FaLanguage className="input-icon" />
               <select
                 name="language"
-                value={language}
+                value={formData.language}
                 onChange={handleChange}
                 className="input-field"
               >
@@ -359,7 +373,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <input
                 type="date"
                 name="publishedDate"
-                value={publishedDate}
+                value={formData.publishedDate}
                 onChange={handleChange}
                 className="input-field"
               />
@@ -375,7 +389,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <input
                 type="text"
                 name="publisher"
-                value={publisher}
+                value={formData.publisher}
                 onChange={handleChange}
                 placeholder="Publisher"
                 className="input-field"
@@ -407,7 +421,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <input
                 type="text"
                 name="ISBN"
-                value={ISBN}
+                value={formData.ISBN}
                 onChange={handleChange}
                 placeholder="ISBN"
                 className="input-field"
@@ -424,7 +438,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
               <input
                 type="checkbox"
                 name="audio"
-                checked={audio}
+                checked={formData.audio}
                 onChange={handleChange}
                 className="checkbox-field"
               />
@@ -440,7 +454,7 @@ const UpdateDonatedBook = ({ bookId, dispatch, book, error }) => {
             <textarea
               name="summary"
               role={"6"}
-              value={summary}
+              value={formData.summary}
               onChange={handleChange}
               placeholder="Summary"
               className="input-field"

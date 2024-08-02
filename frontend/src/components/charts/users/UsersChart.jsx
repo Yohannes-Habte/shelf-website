@@ -11,80 +11,85 @@ const UsersChart = () => {
   const data = [
     {
       month: "January",
-      books: 14,
-      donatedBooks: 15,
-      borrowedBook: 2,
+      bookshelf: 1,
+      books: 1,
+      donatedBooks: 2,
+      borrowedBooks: 2,
     },
     {
       month: "February",
-      books: 23,
-      donatedBooks: 16,
-      borrowedBook: 2,
+      bookshelf: 12,
+      books: 21,
+      donatedBooks: 22,
+      borrowedBooks: 22,
     },
     {
       month: "March",
-      books: 34,
-      donatedBooks: 12,
-      borrowedBook: 2,
+      bookshelf: 18,
+      books: 19,
+      donatedBooks: 20,
+      borrowedBooks: 2,
     },
     {
       month: "April",
-      books: 13,
-      donatedBooks: 12,
-      borrowedBook: 21,
-    },
-    {
-      month: "May",
-      books: 31,
-      donatedBooks: 13,
-      borrowedBook: 2,
+      bookshelf: 51,
+      books: 16,
+      donatedBooks: 32,
+      borrowedBooks: 12,
     },
     {
       month: "June",
-      books: 14,
-      donatedBooks: 14,
-      borrowedBook: 5,
+      bookshelf: 1,
+      books: 34,
+      donatedBooks: 21,
+      borrowedBooks: 7,
     },
     {
       month: "July",
-      books: 31,
-      donatedBooks: 15,
-      borrowedBook: 7,
+      bookshelf: 13,
+      books: 24,
+      donatedBooks: 21,
+      borrowedBooks: 17,
     },
 
     {
       month: "August",
-      books: 41,
-      donatedBooks: 31,
-      borrowedBook: 12,
+      bookshelf: 3,
+      books: 24,
+      donatedBooks: 11,
+      borrowedBooks: 9,
     },
 
     {
       month: "September",
-      books: 51,
+      bookshelf: 33,
+      books: 44,
       donatedBooks: 31,
-      borrowedBook: 16,
+      borrowedBooks: 19,
     },
 
     {
       month: "October",
+      bookshelf: 22,
       books: 31,
-      donatedBooks: 21,
-      borrowedBook: 20,
+      donatedBooks: 22,
+      borrowedBooks: 9,
     },
 
     {
       month: "November",
-      books: 61,
-      donatedBooks: 21,
-      borrowedBook: 12,
+      bookshelf: 32,
+      books: 21,
+      donatedBooks: 12,
+      borrowedBooks: 12,
     },
 
     {
       month: "December",
-      books: 90,
-      donatedBooks: 41,
-      borrowedBook: 20,
+      bookshelf: 12,
+      books: 11,
+      donatedBooks: 5,
+      borrowedBooks: 2,
     },
   ];
   return (
@@ -108,13 +113,15 @@ const UsersChart = () => {
             cursor={{ fill: "none" }}
           />
 
-          <Bar dataKey="books" fill="#8884d8" />
+          <Bar dataKey="bookshelf" fill="#8884d8" />
+          <Bar dataKey="books" fill="#a2d2ff" />
           <Bar dataKey="donatedBooks" fill="#82ca9d" />
-          <Bar dataKey="borrowedBook" fill="#a2d2ff" />
+          <Bar dataKey="borrowedBooks" fill="#0077b6" />
         </BarChart>
       </ResponsiveContainer>
     </section>
   );
 };
+
 
 export default UsersChart;

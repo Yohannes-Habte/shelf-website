@@ -106,10 +106,6 @@ export const deleteComment = async (req, res) => {
     return res.status(400).json({ message: "Invalid comment ID" });
   }
 
-  if (req.user.role !== "priest") {
-    return res.status(403).json({ message: "Forbidden: to delete comment" });
-  }
-
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -123,8 +119,8 @@ export const deleteComment = async (req, res) => {
     }
 
     const user = await User.findOneAndUpdate(
-      { "comments._id": commentId },
-      { $pull: { comments: { _id: commentId } } },
+      { comments: commentId },
+      { $pull: { comments: commentId } },
       { new: true, session }
     );
 
@@ -149,12 +145,12 @@ export const deleteComment = async (req, res) => {
 };
 
 //==========================================================================
-// Get all comments count
+// Count all comments
 //==========================================================================
 export const countComments = async (req, res, next) => {
   try {
     const counts = await Comment.countDocuments();
-    return res.status(200).json(counts);
+    return res.status(200).json({ success: true, result: counts });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }

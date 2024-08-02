@@ -8,7 +8,7 @@ import { fetchDonatedBooks } from "../../../redux/actions/user/userActions";
 const UserDonatedBooks = () => {
   // Global state variables
   const dispatch = useDispatch();
-  const { donatedBooks, currentUser, loading, error } = useSelector(
+  const { donatedBooks, currentUser } = useSelector(
     (state) => state.user
   );
 
@@ -47,23 +47,22 @@ const UserDonatedBooks = () => {
   // Convert donatedBooks to rows for DataGrid
   const rows = donatedBooks.map((book) => ({
     id: book._id,
-    coverImageUrl: book.coverImageUrl || "NULL",
-    title: book.title || "NULL",
+    coverImageUrl: book?.coverImageUrl || "NULL",
+    title: book?.title || "NULL",
     authors:
-      book.authors
-        .map((author) => `${author.firstName} ${author.lastName}`)
+      book?.authors
+        .map((author) => `${author?.firstName} ${author?.lastName}`)
         .join(", ") || "NULL",
-    language: book.language || "NULL",
-    genre: book.genre.category || "NULL",
-    publishedDate: new Date(book.publishedDate).toLocaleDateString() || "NULL",
-    publisher: book.publisher || "NULL",
-    dateDonated: new Date(book.dateDonated).toLocaleDateString() || "NULL",
-    audio: book.audio ? "Yes" : "No",
-    ISBN: book.ISBN || "NULL",
+    language: book?.language || "NULL",
+    genre: book?.genre?.category || "NULL",
+    publishedDate: new Date(book?.publishedDate)?.toLocaleDateString() || "NULL",
+    publisher: book?.publisher || "NULL",
+    dateDonated: new Date(book?.dateDonated)?.toLocaleDateString() || "NULL",
+    audio: book?.audio ? "Yes" : "No",
+    ISBN: book?.ISBN || "NULL",
   }));
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+ 
 
   return (
     <section className="donated-books-container">
