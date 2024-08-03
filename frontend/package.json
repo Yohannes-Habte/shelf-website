@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "country-state-city": "^3.2.1",
+    "html2pdf.js": "^0.10.2",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",

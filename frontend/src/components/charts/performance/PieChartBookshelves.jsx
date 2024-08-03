@@ -79,7 +79,7 @@ const PieChartBookshelves = ({
 
   return (
     <section
-      className="pie-chart-bookshelves"
+      className="pie-chart-bookshelves pt-5 pb-10"
       style={{ width: "35vw", height: "400px" }}
     >
       <ResponsiveContainer width="100%" height="100%">
@@ -90,7 +90,7 @@ const PieChartBookshelves = ({
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={100}
+            outerRadius={120}
             labelLine={renderLabelLine}
             label={renderCustomizedLabel}
           >
@@ -104,6 +104,9 @@ const PieChartBookshelves = ({
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
+      <h4 className="box-title text-center py-4">
+        Fig.3: Annual Performance Overview{" "}
+      </h4>
     </section>
   );
 };

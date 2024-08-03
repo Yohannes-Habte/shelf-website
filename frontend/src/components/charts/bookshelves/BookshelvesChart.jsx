@@ -1,70 +1,83 @@
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
 
-const BookshelvesChart = () => {
-  const data = [
-    {
-      month: "January",
-      size: 80,
-    },
-    {
-      month: "February",
-      size: 60,
-    },
-    {
-      month: "March",
-      size: 70,
-    },
-    {
-      month: "April",
-      size: 150,
-    },
+const BookshelvesChart = ({
+  bookshelves,
+  books,
+  donatedBooks,
+  borrowedBooks,
+}) => {
+  // Group and count bookshelves by month
+  const groupedByMonthBookshelves = bookshelves.reduce((acc, bookshelf) => {
+    const month = new Date(bookshelf.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
 
-    {
-      month: "June",
-      size: 70,
-    },
-    {
-      month: "July",
-      size: 40,
-    },
+  // Group and count books by month
+  const groupedByMonthBooks = books.reduce((acc, book) => {
+    const month = new Date(book.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
 
-    {
-      month: "August",
-      size: 50,
-    },
+  // Group and count donated books by month
+  const groupedByMonthDonatedBooks = donatedBooks.reduce((acc, book) => {
+    const month = new Date(book.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
 
-    {
-      month: "September",
-      size: 120,
-    },
-    {
-      month: "October",
-      size: 60,
-    },
+  // Group and count donated books by month
+  const groupedByMonthBorrowedBooks = borrowedBooks.reduce((acc, book) => {
+    const month = new Date(book.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
 
-    {
-      month: "November",
-      size: 40,
-    },
-
-    {
-      month: "December",
-      size: 100,
-    },
+  // Short month names for better chart readability
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
+  // Create data array with the counts for each month
+  const chartData = months.map((month) => ({
+    month,
+    bookshelf: groupedByMonthBookshelves[month] || 0,
+    books: groupedByMonthBooks[month] || 0,
+    "Donated Books": groupedByMonthDonatedBooks[month] || 0,
+    "Borrowed Books": groupedByMonthBorrowedBooks[month] || 0,
+  }));
+
   return (
-    <section className="donated-books-chart-container">
-      <h4 className="chart-title"> Bookshelves Line Chart </h4>
+    <section className="users-chart-container">
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <BarChart data={chartData} barSize={15}>
           <XAxis
             dataKey="month"
             scale="point"
@@ -73,19 +86,24 @@ const BookshelvesChart = () => {
           <YAxis />
           <Tooltip
             contentStyle={{
-              backgroundColor: "transparent",
-              border: "none",
+              backgroundColor: "#ffefd5",
+              borderRadius: "5px",
+              color: "dark",
             }}
             labelStyle={{ display: "none" }}
-            position={{ x: 10, y: 80 }}
+            cursor={{ fill: "none" }}
           />
-
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" strokeWidth={2} />
-
-          <Line type="monotone" dataKey="size" stroke="#82ca9d" />
-        </LineChart>
+          <Bar dataKey="bookshelf" fill="#00a6fb" />
+          <Bar dataKey="books" fill="#c77dff" />
+          <Bar dataKey="Donated Books" fill="#ff9f1c" />
+          <Bar dataKey="Borrowed Books" fill="#52b788" />
+        </BarChart>
       </ResponsiveContainer>
+      <h4 className="chart-title">
+        Fig.1: Bookshelves, Books, Donated Books, & Borrowed Books
+      </h4>
     </section>
   );
 };
+
 export default BookshelvesChart;

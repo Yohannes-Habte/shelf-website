@@ -5,11 +5,29 @@
   min-height: 100vh;
 }
 .summary-dashboard-container {
+  position: relative;
   @include flexColumn;
   gap: 2rem;
 
   .summary-dashboard-title {
     @include subTitle;
+  }
+
+  .print-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #a2d2ff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
   }
 
   .bookshelves-bar-chart-wrapper {

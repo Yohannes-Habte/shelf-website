@@ -1,5 +1,6 @@
 // src/components/AllBookshelves/AllBookshelves.js
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import html2pdf from "html2pdf.js"; // Import html2pdf.js
 import "./AllBookshelves.scss";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
@@ -130,12 +131,37 @@ const AllBookshelves = () => {
     }
   };
 
+  const downloadRef = useRef(); // Create a reference to the component to download
+
+  const handleDownload = () => {
+    const element = downloadRef.current;
+
+    // Configure options for html2pdf
+    const options = {
+      margin: 0.5,
+      filename: "summary-dashboard.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: {
+        unit: "in",
+        format: "a4", // Use A4 paper size
+        orientation: "landscape", // Set orientation to landscape
+      },
+    };
+
+    // Create PDF and save it
+    html2pdf().from(element).set(options).save();
+  };
   return (
     <section
       className="bookshelves-table-container"
       style={{ height: "400px", width: "100%" }}
     >
       <h3 className="bookshelves-table-title"> List of Bookshelves </h3>
+
+      <button onClick={handleDownload} className="download-button">
+        Download as PDF
+      </button>
 
       <aside className="add-new-bookshelf">
         <h3 className="add-new-bookshelf-title">
@@ -166,11 +192,12 @@ const AllBookshelves = () => {
       </aside>
 
       <DataGrid
+        ref={downloadRef}
         rows={rows}
         columns={columns}
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
+            paginationModel: { page: 0, pageSize: 5 },
           },
         }}
         slots={{ toolbar: GridToolbar }}

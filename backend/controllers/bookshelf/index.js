@@ -253,7 +253,6 @@ export const getBookshelves = async (req, res, next) => {
       result: bookshelves,
     });
   } catch (error) {
-
     return next(createError(500, "Server error! Please try again later."));
   }
 };
@@ -547,8 +546,6 @@ export const countShelvesBorrowedBooks = async (req, res, next) => {
   }
 };
 
-
-
 //==========================================================================
 // Total Number of bookshelves
 //==========================================================================
@@ -565,3 +562,16 @@ export const countBookshelves = async (req, res, next) => {
     next(createError(400, "Server error! Please try again!"));
   }
 };
+
+//==========================================================================
+// Bookshelves bar chart
+//==========================================================================
+
+/**
+ To dynamically populate the total number of bookshelves for each month in a year, you need to extract and process the data from your backend. Here's a step-by-step approach to achieve this:
+
+1. Fetch Data from Backend: Retrieve the bookshelf data from your backend.
+2. Group by Month: Organize the data by the month of the createdAt field.
+3. Count Bookshelves per Month: Count the number of bookshelves created in each month.
+4. Update the Data Array: Populate the data array in your frontend component with the calculated bookshelf counts.
+ */

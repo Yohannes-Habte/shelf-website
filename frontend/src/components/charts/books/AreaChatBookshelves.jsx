@@ -9,92 +9,91 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const AreaChatBookshelves = () => {
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
+const AreaChatBookshelves = ({ bookshelves, books }) => {
+  // Group and count bookshelves by month
+  const groupedByMonthBookshelves = bookshelves.reduce((acc, bookshelf) => {
+    const month = new Date(bookshelf.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Group and count books by month
+  const groupedByMonthBooks = books.reduce((acc, book) => {
+    const month = new Date(book.createdAt).toLocaleString("default", {
+      month: "short",
+    });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Short month names for better chart readability
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
+  // Generate chart data with default values for missing months
+  const chartData = months.map((month) => ({
+    month,
+    bookshelf: groupedByMonthBookshelves[month] || 0,
+    books: groupedByMonthBooks[month] || 0,
+  }));
+
+  // Debugging: Log the processed data
+  console.log("Chart Data:", chartData);
+
   return (
-    <section style={{ width: "40vw", height: "400px" }}>
-      <h4 className="chart-title"> Books Chart </h4>
+    <section className="pt-5 pb-10" style={{ width: "40vw", height: "400px" }}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={data}
+          data={chartData}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
           <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="colorBookshelf" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
               <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="colorBooks" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
               <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="name" />
-          <YAxis
-            tickFormatter={(tick) => `${tick}`} // example of using a default value
-          />
+          <XAxis dataKey="month" />
+          <YAxis tickFormatter={(tick) => `${tick}`} />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Area
             type="monotone"
-            dataKey="uv"
+            dataKey="bookshelf"
             stroke="#8884d8"
             fillOpacity={1}
-            fill="url(#colorUv)"
+            fill="url(#colorBookshelf)"
           />
           <Area
             type="monotone"
-            dataKey="pv"
+            dataKey="books"
             stroke="#82ca9d"
             fillOpacity={1}
-            fill="url(#colorPv)"
+            fill="url(#colorBooks)"
           />
         </AreaChart>
       </ResponsiveContainer>
+      <h4 className="chart-title py-4">
+        Fig.2: Annual Size of Bookshelves and Books
+      </h4>
     </section>
   );
 };
