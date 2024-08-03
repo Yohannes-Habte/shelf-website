@@ -4,11 +4,13 @@ import { validEmail, validPassword } from "../../../utils/validation/validate";
 import { toast } from "react-toastify";
 import { API } from "../../../utils/security/secreteKey";
 import axios from "axios";
-import ReactIcons from "../../reactIcons/ReactIcons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as LoginAction from "../../../redux/reducers/user/userReducer";
 import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
+import Cookies from "js-cookie";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { MdEmail } from "react-icons/md";
 
 const initialState = {
   email: "",
@@ -18,8 +20,6 @@ const initialState = {
 };
 const LoginForm = () => {
   const navigate = useNavigate();
-  // Global icons
-  const { emailIcon, passwordIcon } = ReactIcons();
 
   // Global state variables
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -63,13 +63,11 @@ const LoginForm = () => {
     const { email, password } = formData;
 
     if (!validEmail(email)) {
-      return toast.error("Please enter a valid email");
+      return toast.error("Invalid email");
     }
 
     if (!validPassword(password)) {
-      return toast.error(
-        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
-      );
+      return toast.error("Invalid password");
     }
 
     try {
@@ -81,27 +79,25 @@ const LoginForm = () => {
         password: password,
         rememberMe: rememberMe,
       };
-      const { data } = await axios.post(`${API}/auth/login`, loginUser);
+      const { data } = await axios.post(`${API}/auth/login`, loginUser, {
+        withCredentials: true,
+      });
 
       dispatch(LoginAction.loginSuccess(data.result));
-      toast.success(data.message);
+      toast.success(data?.message);
 
-      // Cookies.set("token", data.token, {
-      //   expires: rememberMe ? 30 : 1,
-      //   secure: true,
-      //   sameSite: "strict",
-      // });
+      // Set token in cookies
+      const token = data?.token;
+      console.log("login token=", token);
+
+      Cookies.set("token", token, {
+        expires: rememberMe ? 30 : 1,
+        secure: true,
+        sameSite: "strict",
+      });
 
       resetHandler();
-      // navigate("/");
-
-      const tokenExpiry = rememberMe
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-        : new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day
-
-      // Save user data and expiration time to local storage
-      localStorage.setItem("user", JSON.stringify(data.result));
-      localStorage.setItem("token", tokenExpiry);
+      navigate("/");
     } catch (err) {
       console.log(err);
       dispatch(LoginAction.loginFailure(err.response.data.message));
@@ -112,7 +108,7 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit} className="login-form">
       {/* Email input container */}
       <div className="input-container">
-        <span className="icon"> {emailIcon} </span>
+        <MdEmail className="icon" />
         <input
           type="email"
           name="email"
@@ -129,7 +125,7 @@ const LoginForm = () => {
 
       {/* Password input container */}
       <div className="input-container">
-        <span className="icon"> {passwordIcon} </span>
+        <RiLockPasswordFill className="icon" />
         <input
           type={showPassword ? "text" : "password"}
           name="password"

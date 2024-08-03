@@ -1,14 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  logoutUserFailure,
-  logoutUserStart,
-  logoutUserSuccess,
-} from "../../redux/reducers/userReducer";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { API } from "../securitiy/secreteKey";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import * as ACTION from "../../redux/reducers/user/userReducer";
+import { API } from "../security/secreteKey";
 
 const Logout = () => {
   const navigate = useNavigate();
@@ -17,12 +13,12 @@ const Logout = () => {
 
   const signOut = async () => {
     try {
-      dispatch(logoutUserStart());
+      dispatch(ACTION.logoutUserStart());
 
       const { data } = await axios.get(`${API}/auth/logout`);
 
       if (data.success) {
-        dispatch(logoutUserSuccess(data.message));
+        dispatch(ACTION.logoutUserSuccess(data.message));
         toast.success(data.message);
 
         // Remove token from cookies
@@ -30,12 +26,12 @@ const Logout = () => {
 
         navigate("/");
       } else {
-        dispatch(logoutUserFailure("Logout failed"));
+        dispatch(ACTION.logoutUserFailure("Logout failed"));
         toast.error("User could not logout");
       }
     } catch (error) {
       dispatch(
-        logoutUserFailure(
+        ACTION.logoutUserFailure(
           error.response ? error.response.data.message : "Network error"
         )
       );

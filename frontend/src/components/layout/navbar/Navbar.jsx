@@ -1,10 +1,16 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import "./Navbar.scss";
+import Logout from "../../../utils/globalFunctions/Logout";
 const Navbar = () => {
-  // const { currentUser } = useSelector((state) => state.user);
-  const currentUser = false;
+  const { currentUser } = useSelector((state) => state.user);
+  const { signOut } = Logout();
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut(); // This will trigger the logout process
+  };
 
   // Local state variable
   const [open, setOpen] = useState(false);
@@ -59,14 +65,6 @@ const Navbar = () => {
                 </li>
               )}
 
-              {currentUser && currentUser.role === "financeManager" && (
-                <li className="menu-item">
-                  <NavLink to={"/finance/dashboard"} className={"link"}>
-                    Finance Dashboard
-                  </NavLink>
-                </li>
-              )}
-
               <li className="menu-item">
                 <NavLink to={"/user/profile"} className={"link"}>
                   User Profile
@@ -74,7 +72,11 @@ const Navbar = () => {
               </li>
 
               <li className="menu-item">
-                <NavLink to={"/login"} className={"link"}>
+                <NavLink
+                  onClick={handleLogout}
+                  to={"/login"}
+                  className={"link"}
+                >
                   Log Out
                 </NavLink>
               </li>

@@ -6,6 +6,7 @@
 .register-page {
   .register-page-container {
     @include form;
+    background-color: $form-bg;
 
     .register-page-title {
       @include title;

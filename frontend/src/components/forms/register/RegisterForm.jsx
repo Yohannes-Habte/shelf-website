@@ -8,7 +8,10 @@ import { toast } from "react-toastify";
 import * as Action from "../../../redux/reducers/user/userReducer";
 import axios from "axios";
 import { API } from "../../../utils/security/secreteKey";
-import ReactIcons from "../../reactIcons/ReactIcons";
+import { FaUser } from "react-icons/fa";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { MdEmail } from "react-icons/md";
+import Cookies from "js-cookie";
 
 const initialState = {
   firstName: "",
@@ -21,8 +24,6 @@ const initialState = {
 const RegisterForm = () => {
   const navigate = useNavigate();
 
-  // Global icons
-  const { userIcon, emailIcon, passwordIcon } = ReactIcons();
   // Global state variables
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -52,46 +53,41 @@ const RegisterForm = () => {
     event.preventDefault();
 
     if (!validEmail(email)) {
-      return toast.error("Please enter a valid email");
+      return toast.error("Invalid email");
     }
 
     if (!validPassword(password)) {
-      return toast.error(
-        "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
-      );
+      return toast.error("Invalid password");
     }
 
     try {
       dispatch(Action.registerStart());
 
-      const { data } = await axios.post(`${API}/auth/register`, formData);
+      const { data } = await axios.post(`${API}/auth/register`, formData, {
+        withCredentials: true,
+      });
 
-      dispatch(Action.registerSuccess(data.result));
-      toast.success(data.message);
+      if (data.token) {
+        dispatch(Action.registerSuccess(data.result));
+        toast.success(data.message);
 
-      const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        // Set token in cookies
+        const token = data.token;
+        console.log("register from Register= ", token);
+        Cookies.set("token", token, {
+          expires: 1,
+          secure: true,
+          sameSite: "strict",
+        });
 
-      // Save user data and expiration time to local storage
-      const userData = {
-        ...data.result,
-        tokenExpiry: tokenExpiry.toISOString(), // Convert date to ISO string for consistent storage
-      };
-
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      // Set token in cookies
-      // const token = data.token;
-      // console.log("register from Register= ", token);
-      // Cookies.set("token", token, {
-      //   expires: 1,
-      //   secure: true,
-      //   sameSite: "strict",
-      // });
-
-      event.target.reset();
-      navigate("/login");
+        event.target.reset();
+        navigate("/login");
+      } else {
+        throw new Error("Token is missing in the response");
+      }
     } catch (err) {
-      dispatch(Action.registerFailure(err.response.data.message));
+      console.log("err=", err);
+      dispatch(Action.registerFailure(toast.error(err.message)));
     }
   };
 
@@ -99,7 +95,7 @@ const RegisterForm = () => {
     <form action="" onSubmit={submitHandler} className="register-form">
       {/* User first name */}
       <div className="input-container">
-        <span className="input-icon"> {userIcon} </span>
+        <FaUser className="input-icon" />
         <input
           type="text"
           name="firstName"
@@ -118,7 +114,7 @@ const RegisterForm = () => {
 
       {/* User last name */}
       <div className="input-container">
-        <span className="input-icon"> {userIcon} </span>
+        <FaUser className="input-icon" />
 
         <input
           type="text"
@@ -138,7 +134,7 @@ const RegisterForm = () => {
 
       {/* User email address */}
       <div className="input-container">
-        <span className="input-icon"> {emailIcon} </span>
+        <MdEmail className="input-icon" />
         <input
           type="email"
           name="email"
@@ -156,7 +152,7 @@ const RegisterForm = () => {
 
       {/* User password */}
       <div className="input-container">
-        <span className="input-icon"> {passwordIcon} </span>
+        <RiLockPasswordFill className="input-icon" />
         <input
           type={showPassword ? "text" : "password"}
           name="password"

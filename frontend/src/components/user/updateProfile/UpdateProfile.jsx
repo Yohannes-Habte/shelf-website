@@ -6,6 +6,8 @@ import UserInbox from "../userInbox/UserInbox";
 import "./UpdateProfile.scss";
 
 const UpdateProfile = ({ isActive }) => {
+
+
   return (
     <article>
       {isActive === 1 && (

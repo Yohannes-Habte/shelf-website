@@ -1,5 +1,5 @@
 import "./UpdateUserForm.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./UpdateUserForm.scss";
 import {
   FaCity,
@@ -21,21 +21,31 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const UpdateUserForm = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  // Global state variables
+  const { currentUser, loading } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!loading && !currentUser) {
+      navigate("/");
+    }
+  }, [currentUser]);
+
   const initialState = {
-    firstName: currentUser.firstName || "",
-    lastName: currentUser.lastName || "",
-    email: currentUser.email || "",
+    firstName: currentUser?.firstName || "",
+    lastName: currentUser?.lastName || "",
+    email: currentUser?.email || "",
     password: "",
     image: null,
     banner: null,
-    street: currentUser.street || "",
-    zipCode: currentUser.zipCode || "",
-    city: currentUser.city || "",
-    state: currentUser.state || "",
-    country: currentUser.country || "",
+    street: currentUser?.street || "",
+    zipCode: currentUser?.zipCode || "",
+    city: currentUser?.city || "",
+    state: currentUser?.state || "",
+    country: currentUser?.country || "",
     agree: false,
   };
   const [formData, setFormData] = useState(initialState);

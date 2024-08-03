@@ -39,7 +39,6 @@ const initialState = {
 };
 
 const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
-
   // Global state variables (from Redux)
   const { loading, error: formError } = useSelector((state) => state.bookshelf);
   const dispatch = useDispatch();
@@ -48,7 +47,6 @@ const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
   const mapRef = useRef(null);
   const [markerPosition, setMarkerPosition] = useState(null);
   const [clickPosition, setClickPosition] = useState(null);
-  console.log("position=", clickPosition);
 
   // Local state variables
   const [formState, setFormState] = useState(initialState);
@@ -87,8 +85,6 @@ const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-  
 
     try {
       // Image validation and upload (using FormData)
@@ -129,203 +125,203 @@ const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
   return (
     <article className="bookshelf-modal">
       <section className="bookshelf-popup-box">
-        <span className="close-modal" onClick={() => setOpenClickMapBookshelf(false)}>
+        <span
+          className="close-modal"
+          onClick={() => setOpenClickMapBookshelf(false)}
+        >
           X
         </span>
         <h3 className="bookshelf-form-title">Add New Bookshelf</h3>
 
-        <div className="form-map-wrapper">
-          <form onSubmit={handleSubmit} className="bookshelf-form">
-            <div className="input-containers-wrapper">
-              {/* Bookshelf Photo */}
-              <div className="input-container">
-                <FaCloudUploadAlt className="input-icon" />
-                <input
-                  type="file"
-                  name="image"
-                  onChange={handleChange}
-                  className="input-field"
-                />
-                <label htmlFor="image" className="input-label">
-                  Upload Bookshelf Photo
-                </label>
-                <span className="input-highlight"></span>
-              </div>
-
-              {/* Bookshelf Name */}
-              <div className="input-container">
-                <GiBookshelf className="input-icon" />
-                <input
-                  type="text"
-                  name="name"
-                  value={name}
-                  onChange={handleChange}
-                  placeholder="Bookshelf Name"
-                  className="input-field"
-                  required
-                />
-                <label htmlFor="name" className="input-label">
-                  Name
-                </label>
-                <span className="input-highlight"></span>
-              </div>
-
-              {/* Select Country */}
-              <div className="input-container">
-                <FaGlobeAmericas className="input-icon" />
-                <select
-                  name="country"
-                  id="country"
-                  value={country}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Choose your country</option>
-                  {Country &&
-                    Country.getAllCountries().map((country) => (
-                      <option key={country.isoCode} value={country.isoCode}>
-                        {country.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* Select State */}
-              <div className="input-container">
-                <FaMapMarkedAlt className="input-icon" />
-                <select
-                  name="state"
-                  id="state"
-                  value={stateName}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Choose your state</option>
-                  {State &&
-                    State.getStatesOfCountry(country).map((state) => (
-                      <option key={state.isoCode} value={state.isoCode}>
-                        {state.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* Select City */}
-              <div className="input-container">
-                <FaCity className="input-icon" />
-                <select
-                  name="city"
-                  id="city"
-                  value={city}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Choose your city</option>
-                  {City &&
-                    City.getCitiesOfState(country, stateName).map((city) => (
-                      <option key={city.name} value={city.name}>
-                        {city.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* Zip Code */}
-              <div className="input-container">
-                <FaEnvelope className="input-icon" />
-                <input
-                  type="text"
-                  name="zipCode"
-                  value={zipCode}
-                  onChange={handleChange}
-                  placeholder="Zip Code"
-                  className="input-field"
-                  required
-                />
-                <label htmlFor="zipCode" className="input-label">
-                  Zip Code
-                </label>
-                <span className="input-highlight"></span>
-              </div>
-
-              {/* Street */}
-              <div className="input-container">
-                <FaRoad className="input-icon" />
-                <input
-                  type="text"
-                  name="street"
-                  value={street}
-                  onChange={handleChange}
-                  placeholder="Street"
-                  className="input-field"
-                  required
-                />
-                <label htmlFor="street" className="input-label">
-                  Street
-                </label>
-                <span className="input-highlight"></span>
-              </div>
-
-              {/* Opening Time */}
-              <div className="input-container">
-                <MdAccessTimeFilled className="input-icon" />
-                <input
-                  type="time"
-                  name="openingTime"
-                  value={openingTime}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                />
-                <label htmlFor="openingTime" className="input-label">
-                  Opening Time
-                </label>
-                <span className="input-highlight"></span>
-              </div>
-
-              {/* Closing Time */}
-              <div className="input-container">
-                <MdAccessTimeFilled className="input-icon" />
-                <input
-                  type="time"
-                  name="closingTime"
-                  value={closingTime}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                />
-                <label htmlFor="closingTime" className="input-label">
-                  Closing Time
-                </label>
-                <span className="input-highlight"></span>
-              </div>
+        <div className="px-2">
+          <BookshelfMap
+            mapRef={mapRef}
+            markerPosition={markerPosition}
+            setMarkerPosition={setMarkerPosition}
+            clickPosition={clickPosition}
+            setClickPosition={setClickPosition}
+          />
+        </div>
+        <form onSubmit={handleSubmit} className="bookshelf-form">
+          <div className="input-containers-wrapper">
+            {/* Bookshelf Photo */}
+            <div className="input-container">
+              <FaCloudUploadAlt className="input-icon" />
+              <input
+                type="file"
+                name="image"
+                onChange={handleChange}
+                className="input-field"
+              />
+              <label htmlFor="image" className="input-label">
+                Upload Bookshelf Photo
+              </label>
+              <span className="input-highlight"></span>
             </div>
 
-            {/* Submit Button */}
-            <button className="bookshelf-btn" disabled={loading}>
-              {loading ? (
-                <span className="loading">
-                  <ButtonLoader /> Loading...
-                </span>
-              ) : (
-                "Add Bookshelf"
-              )}
-            </button>
-          </form>
+            {/* Bookshelf Name */}
+            <div className="input-container">
+              <GiBookshelf className="input-icon" />
+              <input
+                type="text"
+                name="name"
+                value={name}
+                onChange={handleChange}
+                placeholder="Bookshelf Name"
+                className="input-field"
+                required
+              />
+              <label htmlFor="name" className="input-label">
+                Name
+              </label>
+              <span className="input-highlight"></span>
+            </div>
 
-          <div className="px-2">
-            <BookshelfMap
-              mapRef={mapRef}
-              markerPosition={markerPosition}
-              setMarkerPosition={setMarkerPosition}
-              clickPosition={clickPosition}
-              setClickPosition={setClickPosition}
-            />
+            {/* Select Country */}
+            <div className="input-container">
+              <FaGlobeAmericas className="input-icon" />
+              <select
+                name="country"
+                id="country"
+                value={country}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your country</option>
+                {Country &&
+                  Country.getAllCountries().map((country) => (
+                    <option key={country.isoCode} value={country.isoCode}>
+                      {country.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Select State */}
+            <div className="input-container">
+              <FaMapMarkedAlt className="input-icon" />
+              <select
+                name="state"
+                id="state"
+                value={stateName}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your state</option>
+                {State &&
+                  State.getStatesOfCountry(country).map((state) => (
+                    <option key={state.isoCode} value={state.isoCode}>
+                      {state.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Select City */}
+            <div className="input-container">
+              <FaCity className="input-icon" />
+              <select
+                name="city"
+                id="city"
+                value={city}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Choose your city</option>
+                {City &&
+                  City.getCitiesOfState(country, stateName).map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Zip Code */}
+            <div className="input-container">
+              <FaEnvelope className="input-icon" />
+              <input
+                type="text"
+                name="zipCode"
+                value={zipCode}
+                onChange={handleChange}
+                placeholder="Zip Code"
+                className="input-field"
+                required
+              />
+              <label htmlFor="zipCode" className="input-label">
+                Zip Code
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Street */}
+            <div className="input-container">
+              <FaRoad className="input-icon" />
+              <input
+                type="text"
+                name="street"
+                value={street}
+                onChange={handleChange}
+                placeholder="Street"
+                className="input-field"
+                required
+              />
+              <label htmlFor="street" className="input-label">
+                Street
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Opening Time */}
+            <div className="input-container">
+              <MdAccessTimeFilled className="input-icon" />
+              <input
+                type="time"
+                name="openingTime"
+                value={openingTime}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+              <label htmlFor="openingTime" className="input-label">
+                Opening Time
+              </label>
+              <span className="input-highlight"></span>
+            </div>
+
+            {/* Closing Time */}
+            <div className="input-container">
+              <MdAccessTimeFilled className="input-icon" />
+              <input
+                type="time"
+                name="closingTime"
+                value={closingTime}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+              <label htmlFor="closingTime" className="input-label">
+                Closing Time
+              </label>
+              <span className="input-highlight"></span>
+            </div>
           </div>
-        </div>
+
+          {/* Submit Button */}
+          <button className="bookshelf-btn" disabled={loading}>
+            {loading ? (
+              <span className="loading">
+                <ButtonLoader /> Loading...
+              </span>
+            ) : (
+              "Add Bookshelf"
+            )}
+          </button>
+        </form>
 
         {formError && <p className="error-message">{formError}</p>}
       </section>
@@ -333,6 +329,4 @@ const ClickOnMapBookshelf = ({ setOpenClickMapBookshelf }) => {
   );
 };
 
-
-
-export default ClickOnMapBookshelf
+export default ClickOnMapBookshelf;

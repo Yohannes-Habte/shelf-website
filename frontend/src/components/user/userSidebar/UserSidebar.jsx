@@ -4,14 +4,21 @@ import { MdOutlineMessage } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
 import { FaBook } from "react-icons/fa6";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RiAdminFill } from "react-icons/ri";
 import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
+import { useEffect } from "react";
 
 const UserSidebar = ({ isActive, setIsActive }) => {
+  const navigate = useNavigate();
   // Global state variables
   const { currentUser, loading } = useSelector((state) => state.user);
 
+  useEffect(() => {
+    if (!loading && !currentUser) {
+      navigate("/");
+    }
+  }, [currentUser]);
   const handleLogout = () => {};
 
   return (

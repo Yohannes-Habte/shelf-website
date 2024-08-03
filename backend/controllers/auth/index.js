@@ -41,11 +41,12 @@ export const createUser = async (req, res, next) => {
       res
         .cookie("token", token, {
           path: "/",
-          httpOnly: false,
+          httpOnly: false, // Adjust based on your requirement
           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "strict",
           secure: true,
         })
+
         .status(201)
         .json({
           success: true,
@@ -76,14 +77,7 @@ export const loginUser = async (req, res, next) => {
     }
 
     if (user && isPasswordValid) {
-      const {
-        password,
-        bookshelfManager,
-        financeManager,
-        generalManager,
-        ...rest
-      } = user._doc;
-
+      const { password, ...rest } = user._doc;
       const token = generateToken(user);
 
       const tokenExpiry = rememberMe
@@ -93,12 +87,11 @@ export const loginUser = async (req, res, next) => {
       res
         .cookie("token", token, {
           path: "/",
-          httpOnly: false,
+          httpOnly: false, 
           expires: tokenExpiry,
           sameSite: "strict",
           secure: true,
         })
-
         .status(200)
         .json({
           success: true,
@@ -110,6 +103,7 @@ export const loginUser = async (req, res, next) => {
     return next(createError(400, "Server error! Please try again!"));
   }
 };
+
 
 //==========================================================================
 // Update user account

@@ -29,6 +29,7 @@
     @include flexRow;
     align-items: center;
     position: relative;
+    z-index: 999;
 
     .logged-in-user-image {
       @include loggedInUserImage;

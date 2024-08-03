@@ -4,6 +4,7 @@
 .login-page {
   .login-page-container {
     @include form;
+    background-color: $form-bg;
 
     .login-page-title {
       @include title;

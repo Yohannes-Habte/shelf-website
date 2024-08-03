@@ -1,9 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentUser: localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null,
+  currentUser: null,
   users: [],
   borrowedBooks: [],
   donatedBooks: [],
@@ -155,7 +153,7 @@ export const {
   fetchAllUsersStart,
   fetchAllUsersSuccess,
   fetchAllUsersFailure,
-  
+
   countUsersStart,
   countUsersSuccess,
   countUsersFailure,
