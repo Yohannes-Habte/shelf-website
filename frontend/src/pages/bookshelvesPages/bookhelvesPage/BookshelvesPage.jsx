@@ -3,6 +3,7 @@ import Header from "../../../components/layout/header/Header";
 import "./BookshelvesPage.scss";
 import BookshelfSearchForm from "../../../components/forms/search/BookshelfSearchForm";
 import BookshelfList from "../../../components/bookshelf/allBookshelves/BookshelfList";
+import Footer from "../../../components/layout/footer/Footer";
 
 const BookshelvesPage = () => {
   return (
@@ -16,6 +17,8 @@ const BookshelvesPage = () => {
         <BookshelfSearchForm />
         <BookshelfList />
       </section>
+
+      <Footer />
     </main>
   );
 };

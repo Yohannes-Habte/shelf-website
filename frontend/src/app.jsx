@@ -13,8 +13,18 @@ import AdminDashboardPage from "./pages/dashboardPages/adminDashboardPage/AdminD
 import BookPage from "./pages/booksPages/bookPage/BookPage";
 import BooksPage from "./pages/booksPages/booksPage/BooksPage";
 import DonatedBookPage from "./pages/donatedBooksPages/donatedBookPage/DonatedBookPage";
+import { useEffect } from "react";
+import { fetchUserData } from "./redux/reducers/user/userReducer";
+import { useDispatch } from "react-redux";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
+  
   return (
     <div>
       <Routes>

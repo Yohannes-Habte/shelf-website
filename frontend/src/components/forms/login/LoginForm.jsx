@@ -25,6 +25,8 @@ const LoginForm = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  console.log("Johannes=", currentUser)
+
   // Local state variables
   const [formData, setFormData] = useState(initialState);
   const { email, password, showPassword, rememberMe } = formData;
@@ -79,16 +81,18 @@ const LoginForm = () => {
         password: password,
         rememberMe: rememberMe,
       };
-      const { data } = await axios.post(`${API}/auth/login`, loginUser, {
+      const res = await axios.post(`${API}/auth/login`, loginUser, {
         withCredentials: true,
       });
-
-      dispatch(LoginAction.loginSuccess(data.result));
-      toast.success(data?.message);
+      // const { data } = await axios.post(`${API}/auth/login`, loginUser, {
+      //   withCredentials: true,
+      // });
+    
+      dispatch(LoginAction.loginSuccess(res.data.result));
+      toast.success(res.data?.message);
 
       // Set token in cookies
-      const token = data?.token;
-      console.log("login token=", token);
+      const token = res.data?.token;
 
       Cookies.set("token", token, {
         expires: rememberMe ? 30 : 1,

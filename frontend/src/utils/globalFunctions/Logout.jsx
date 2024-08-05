@@ -23,7 +23,6 @@ const Logout = () => {
 
         // Remove token from cookies
         Cookies.remove("token");
-
         navigate("/");
       } else {
         dispatch(ACTION.logoutUserFailure("Logout failed"));

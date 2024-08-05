@@ -128,6 +128,7 @@ const AllUsers = () => {
         pageSizeOptions={[5, 10]}
         checkboxSelection
         disableRowSelectionOnClick
+        autoHeight // Adjust the height automatically
         //
       />
 

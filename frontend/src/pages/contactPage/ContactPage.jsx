@@ -3,6 +3,7 @@ import Header from "../../components/layout/header/Header";
 import "./ContactPage.scss";
 import ContactTools from "../../components/contact/ContactTools";
 import ContactForm from "../../components/forms/contact/ContactForm";
+import Footer from "../../components/layout/footer/Footer";
 
 const ContactPage = () => {
   return (
@@ -20,10 +21,10 @@ const ContactPage = () => {
           <ContactForm />
         </div>
       </section>
-   
+
+      <Footer />
     </main>
   );
 };
-
 
 export default ContactPage;

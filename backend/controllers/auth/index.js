@@ -37,18 +37,13 @@ export const createUser = async (req, res, next) => {
 
       // Generate token for a user
       const token = generateToken(newUser);
-
-      res
-        .cookie("token", token, {
+      res.cookie("token", token, {
           path: "/",
           httpOnly: false, // Adjust based on your requirement
           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "strict",
           secure: true,
-        })
-
-        .status(201)
-        .json({
+        }).status(201).json({
           success: true,
           message: "Account successfully created!",
         });
@@ -76,31 +71,29 @@ export const loginUser = async (req, res, next) => {
       return next(createError(400, "Incorrect password!"));
     }
 
-    if (user && isPasswordValid) {
-      const { password, ...rest } = user._doc;
-      const token = generateToken(user);
+    const { password: userPassword, ...rest } = user._doc;
+    const token = generateToken(rest);
 
-      const tokenExpiry = rememberMe
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const tokenExpiry = rememberMe
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      res
-        .cookie("token", token, {
-          path: "/",
-          httpOnly: false, 
-          expires: tokenExpiry,
-          sameSite: "strict",
-          secure: true,
-        })
-        .status(200)
-        .json({
-          success: true,
-          result: { ...rest },
-          message: "User successfully logged in!",
-        });
-    }
+    res.cookie("token", token, {
+        path: "/",
+        httpOnly: false, // Set to true to prevent client-side access
+        expires: tokenExpiry,
+        sameSite: "strict",
+        secure: true, // Ensure the secure flag is set in a production environment
+      })
+      .status(200)
+      .json({
+        success: true,
+        result: { ...rest },
+        token,
+        message: "User successfully logged in!",
+      });
   } catch (error) {
-    return next(createError(400, "Server error! Please try again!"));
+    return next(createError(500, "Server error! Please try again!"));
   }
 };
 

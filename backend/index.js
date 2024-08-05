@@ -16,20 +16,24 @@ import commentRouter from "./routes/comment/index.js";
 import donatedBookRouter from "./routes/donatedBook/index.js";
 import genreRouter from "./routes/genre/index.js";
 import ratingRouter from "./routes/ratings/index.js";
+import subscribeRouter from "./routes/subscribe/index.js";
 
 // Express app
+dotenv.config();
 const app = express();
-app.use(cookieParser());
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-);
-app.use(express.json());
+const corsConfig = process.env.NODE_ENV==="development" ? {
+  origin: "http://localhost:3000",
+  credentials: true,
+} : {
+  origin: process.env.URL,
+  credentials: true,
+}
+
+app.use(cors(corsConfig),express.json(),cookieParser());
+// app.use(express.json());
+// app.use(cookieParser());
 
 // Security key holder
-dotenv.config();
 
 // End points
 app.use("/api/v1/auth", authUserRouter);
@@ -41,6 +45,7 @@ app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/donatedBooks", donatedBookRouter);
 app.use("/api/v1/genres", genreRouter);
 app.use("/api/v1/ratings", ratingRouter);
+app.use("/api/v1/subscribers", subscribeRouter);
 
 // Static assets
 app.use(express.static("assets"));

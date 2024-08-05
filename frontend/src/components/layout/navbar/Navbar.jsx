@@ -1,11 +1,17 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import "./Navbar.scss";
 import Logout from "../../../utils/globalFunctions/Logout";
+import { fetchUserData } from "../../../redux/reducers/user/userReducer";
 const Navbar = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const { signOut } = Logout();
+
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
 
   // Handle logout
   const handleLogout = async () => {

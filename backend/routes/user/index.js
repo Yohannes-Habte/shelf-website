@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  getSingleUser,
   getTotalUsersCount,
   getUser,
   getUserBorrowedBooks,
@@ -8,12 +9,14 @@ import {
   getUsers,
   updateUserAddress,
 } from "../../controllers/user/index.js";
+import { isAuthenticated } from "../../middlewares/auth/index.js";
 
 // Auth User Router
 const userRouter = express.Router();
 
 // User Routes
 userRouter.get("/", getUsers);
+userRouter.get("/user", isAuthenticated, getSingleUser);
 userRouter.get("/:id", getUser);
 userRouter.put("/id", updateUserAddress);
 userRouter.delete("/:id", deleteUser);

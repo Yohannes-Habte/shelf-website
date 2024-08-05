@@ -30,6 +30,7 @@ import {
 import PieChartBookshelves from "../../charts/performance/PieChartBookshelves";
 import { countComments } from "../../../redux/actions/comment/commentActions";
 import BookshelvesChart from "../../charts/bookshelves/BookshelvesChart";
+import SubscriberNotification from "../../forms/subscriberNotification/SubscriberNotification";
 
 const DashboardSummary = ({ isActive }) => {
   const dispatch = useDispatch();
@@ -105,6 +106,7 @@ const DashboardSummary = ({ isActive }) => {
       {isActive === 8 && <Ratings />}
       {isActive === 9 && <Genres />}
       {isActive === 10 && <AdminInbox />}
+      {isActive === 11 && <SubscriberNotification />}
     </article>
   );
 };

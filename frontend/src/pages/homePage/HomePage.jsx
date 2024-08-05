@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import Header from "../../components/layout/header/Header";
 import "./HomePage.scss";
 import Bookshelves from "../../components/map/bookshelves/Bookshelves";
+import Footer from "../../components/layout/footer/Footer";
 
 const HomePage = () => {
   return (
@@ -15,6 +16,7 @@ const HomePage = () => {
 
         <Bookshelves />
       </section>
+      <Footer />
     </main>
   );
 };

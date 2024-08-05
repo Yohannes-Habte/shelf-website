@@ -1,4 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { API } from "../../../utils/security/secreteKey";
 
 const initialState = {
   currentUser: null,
@@ -114,6 +117,14 @@ const userSlice = createSlice({
     },
     fetchDonatedBooksFailure: setError,
 
+    // Fetch User Data
+    fetchUserDataStart: setLoading,
+    fetchUserDataSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+    },
+    fetchUserDataFailure: setError,
+
     // Clear Errors
     clearErrors: (state) => {
       state.error = null;
@@ -166,7 +177,27 @@ export const {
   fetchDonatedBooksSuccess,
   fetchDonatedBooksFailure,
 
+  fetchUserDataStart,
+  fetchUserDataSuccess,
+  fetchUserDataFailure,
+
   clearErrors,
 } = userSlice.actions;
 
+export const fetchUserData = () => async (dispatch) => {
+  dispatch(fetchUserDataStart());
+
+  try {
+    const token = Cookies.get("token");
+
+    if (!token) throw new Error("No token found");
+    const res = await axios.get(`${API}/users/user`, {
+      withCredentials: true,
+    });
+    // console.log("user data=", res);
+    dispatch(fetchUserDataSuccess(res.data));
+  } catch (error) {
+    dispatch(fetchUserDataFailure(error.message));
+  }
+};
 export default userSlice.reducer;
