@@ -1,6 +1,6 @@
 import createError from "http-errors";
 import Subscriber from "../../models/subscribe/index.js";
-import sendEmail from "../../utils/sendGrid/index.js";
+import sendEmail from "../../utils/subscribe/index.js";
 
 //===========================================================================================
 // Create a a new subscriber
@@ -28,16 +28,21 @@ export const createSubscriber = async (req, res, next) => {
 //===========================================================================================
 // Create a function to fetch all subscribers and send them a notification email (auth admin)
 //===========================================================================================
-
-const notifySubscribers = async (subject, text) => {
+const notifySubscribers = async (subject, message) => {
   try {
     const subscribers = await Subscriber.find();
 
     subscribers.forEach((subscriber) => {
-      sendEmail(subscriber.email, subject, text);
+      if (subscriber.email) {
+        sendEmail({
+          email: subscriber.email,
+          subject,
+          message,
+        });
+      } else {
+        console.error("Subscriber email is undefined:", subscriber);
+      }
     });
-
-    console.log("Notifications sent to all subscribers");
   } catch (error) {
     console.error("Error sending notifications:", error);
   }
@@ -48,9 +53,8 @@ export const sendNotifications = async (req, res) => {
 
   try {
     await notifySubscribers(subject, text);
-    res.status(200).json({ message: "Visit our website or store to get new featured product at 20% discount!" });
+    res.status(200).json({ message: "Notifications sent to all subscribers" });
   } catch (err) {
-    console.error(err.message);
     res.status(500).send("Server error");
   }
 };

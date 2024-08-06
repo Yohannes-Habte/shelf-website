@@ -24,7 +24,7 @@ export const isAuthenticated = (req, res, next) => {
 
   try {
     const user = verifyToken(token);
-    console.log("is authonticated =", user)
+
     req.user = user;
     next();
   } catch (error) {
