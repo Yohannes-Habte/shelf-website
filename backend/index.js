@@ -25,7 +25,7 @@ const corsConfig = process.env.NODE_ENV==="development" ? {
   origin: "http://localhost:3000",
   credentials: true,
 } : {
-  origin: process.env.URL,
+  origin: "https://tim-shelf.netlify.app/",
   credentials: true,
 }
 
