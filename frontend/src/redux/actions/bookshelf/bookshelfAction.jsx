@@ -43,18 +43,30 @@ export const fetchBookshelf = (id) => async (dispatch) => {
   }
 };
 
-// Fetch all bookshelves
+// // Fetch all bookshelves
+// export const fetchAllBookshelves = (searchParams) => async (dispatch) => {
+//   dispatch(fetchAllBookshelvesStart());
+//   try {
+//     // Check if searchParams is properly formatted
+//     const { data } = await axios.get(`${API}/bookshelves`, { params: searchParams });
+//     dispatch(fetchAllBookshelvesSuccess(data.result));
+//   } catch (error) {
+//     console.error('Error fetching bookshelves:', error);
+//     dispatch(fetchAllBookshelvesFailure(error.message));
+//   }
+// };
+
+// Action creator for fetching all bookshelves with pagination
+// Action creator for fetching all bookshelves with pagination
 export const fetchAllBookshelves = (searchParams) => async (dispatch) => {
   dispatch(fetchAllBookshelvesStart());
   try {
-    // Check if searchParams is properly formatted
-    console.log('Search Params:', searchParams);
-
     const { data } = await axios.get(`${API}/bookshelves`, { params: searchParams });
-    dispatch(fetchAllBookshelvesSuccess(data.result));
+    dispatch(fetchAllBookshelvesSuccess({ bookshelves: data.result, page: searchParams.page || 1 }));
+    return data.result.length > 0;
   } catch (error) {
-    console.error('Error fetching bookshelves:', error);
     dispatch(fetchAllBookshelvesFailure(error.message));
+    return false;
   }
 };
 

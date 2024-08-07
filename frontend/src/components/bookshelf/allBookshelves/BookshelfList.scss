@@ -1,8 +1,8 @@
 @import "../../../styles/Mixins.scss";
 @import "../../../styles/Variables.scss";
 
-.bookshelf-cards-wrapper {
-  @include twoGridTemplateEqualColumns;
+.bookshelves-card-wrapper {
+  @include threeGridTemplateEqualColumns;
   column-gap: 2rem;
   row-gap: 2rem;
 }

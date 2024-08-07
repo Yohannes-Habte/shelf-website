@@ -21,15 +21,25 @@ import subscribeRouter from "./routes/subscribe/index.js";
 // Express app
 dotenv.config();
 const app = express();
-const corsConfig = process.env.NODE_ENV==="development" ? {
-  origin: "http://localhost:3000",
-  credentials: true,
-} : {
-  origin: "https://tim-shelf.netlify.app/",
-  credentials: true,
-}
+const corsConfig =
+  process.env.NODE_ENV === "development"
+    ? {
+        origin: "http://localhost:3000",
+        credentials: true,
+      }
+    : {
+        origin: process.env.URL,
+        credentials: true,
+      };
 
-app.use(cors(corsConfig),express.json(),cookieParser());
+// app.use(
+//   cors({
+//     origin: ['http://localhost:3000', 'https://tim-shelf.netlify.app'],
+//     credentials: true, // to send token from the backend to the frontend
+//   })
+// );
+
+app.use(cors(corsConfig), express.json(), cookieParser());
 // app.use(express.json());
 // app.use(cookieParser());
 

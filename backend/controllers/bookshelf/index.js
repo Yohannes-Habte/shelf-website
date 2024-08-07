@@ -221,7 +221,7 @@ export const updateBookshelf = async (req, res, next) => {
 
 export const getBookshelves = async (req, res, next) => {
   try {
-    const { country, state, city, name } = req.query;
+    const { country, state, city, name, page = 1 } = req.query;
 
     let query = {};
 
@@ -238,7 +238,10 @@ export const getBookshelves = async (req, res, next) => {
       query.name = new RegExp(`^${name}$`, "i");
     }
 
-    const bookshelves = await Bookshelf.find(query);
+    const limit = 6;
+    const skip = (page - 1) * limit;
+
+    const bookshelves = await Bookshelf.find(query).limit(limit).skip(skip);
 
     // If no bookshelves found, return a 404 response
     if (bookshelves.length === 0) {

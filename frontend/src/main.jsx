@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import Store from "./redux/Store.jsx";
 import UserLocationProvider from "./context/userLocation/UserLocationProvider.jsx";
+import BookshelvesProvider from "./context/bookshelves/BookshelvesProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <HelmetProvider>
         <BrowserRouter>
           <UserLocationProvider>
-            <App />
+            <BookshelvesProvider>
+              <App />
+            </BookshelvesProvider>
           </UserLocationProvider>
         </BrowserRouter>
       </HelmetProvider>

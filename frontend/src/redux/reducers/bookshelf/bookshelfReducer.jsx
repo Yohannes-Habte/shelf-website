@@ -41,7 +41,14 @@ const bookshelfSlice = createSlice({
     // Fetch all bookshelves
     fetchAllBookshelvesStart: setLoading,
     fetchAllBookshelvesSuccess: (state, action) => {
-      state.bookshelves = action.payload;
+      if (action.payload.page === 1) {
+        state.bookshelves = action.payload.bookshelves; // Reset bookshelves for new search
+      } else {
+        state.bookshelves = [
+          ...state.bookshelves,
+          ...action.payload.bookshelves,
+        ]; // Append new data for pagination
+      }
       state.loading = false;
     },
     fetchAllBookshelvesFailure: setError,
