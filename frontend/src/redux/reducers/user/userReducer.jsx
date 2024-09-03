@@ -190,12 +190,12 @@ export const fetchUserData = () => async (dispatch) => {
   try {
     const token = Cookies.get("token");
 
-    if (!token) throw new Error("No token found");
+    if (!token) throw new Error("No user found");
     const res = await axios.get(`${API}/users/user`, {
       withCredentials: true,
     });
     // console.log("user data=", res);
-    dispatch(fetchUserDataSuccess(res.data));
+    dispatch(fetchUserDataSuccess(res.data.result));
   } catch (error) {
     dispatch(fetchUserDataFailure(error.message));
   }

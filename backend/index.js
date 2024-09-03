@@ -46,16 +46,16 @@ app.use(cors(corsConfig), express.json(), cookieParser());
 // Security key holder
 
 // End points
-app.use("/api/v1/auth", authUserRouter);
-app.use("/api/v1/users", userRouter);
-app.use("/api/v1/bookshelves", bookshelfRouter);
-app.use("/api/v1/books", bookRouter);
-app.use("/api/v1/borrowedBooks", borrowedBookRouter);
-app.use("/api/v1/comments", commentRouter);
-app.use("/api/v1/donatedBooks", donatedBookRouter);
-app.use("/api/v1/genres", genreRouter);
-app.use("/api/v1/ratings", ratingRouter);
-app.use("/api/v1/subscribers", subscribeRouter);
+app.use("/api/v2/auth", authUserRouter);
+app.use("/api/v2/users", userRouter);
+app.use("/api/v2/bookshelves", bookshelfRouter);
+app.use("/api/v2/books", bookRouter);
+app.use("/api/v2/borrowedBooks", borrowedBookRouter);
+app.use("/api/v2/comments", commentRouter);
+app.use("/api/v2/donatedBooks", donatedBookRouter);
+app.use("/api/v2/genres", genreRouter);
+app.use("/api/v2/ratings", ratingRouter);
+app.use("/api/v2/subscribers", subscribeRouter);
 
 // Static assets
 app.use(express.static("assets"));

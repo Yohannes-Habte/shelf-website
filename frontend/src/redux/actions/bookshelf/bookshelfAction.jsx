@@ -57,12 +57,18 @@ export const fetchBookshelf = (id) => async (dispatch) => {
 // };
 
 // Action creator for fetching all bookshelves with pagination
-// Action creator for fetching all bookshelves with pagination
 export const fetchAllBookshelves = (searchParams) => async (dispatch) => {
   dispatch(fetchAllBookshelvesStart());
   try {
-    const { data } = await axios.get(`${API}/bookshelves`, { params: searchParams });
-    dispatch(fetchAllBookshelvesSuccess({ bookshelves: data.result, page: searchParams.page || 1 }));
+    const { data } = await axios.get(`${API}/bookshelves`, {
+      params: searchParams,
+    });
+    dispatch(
+      fetchAllBookshelvesSuccess({
+        bookshelves: data.result,
+        page: searchParams.page || 1,
+      })
+    );
     return data.result.length > 0;
   } catch (error) {
     dispatch(fetchAllBookshelvesFailure(error.message));

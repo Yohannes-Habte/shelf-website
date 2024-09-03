@@ -238,7 +238,7 @@ export const getBookshelves = async (req, res, next) => {
       query.name = new RegExp(`^${name}$`, "i");
     }
 
-    const limit = 6;
+    const limit = 9;
     const skip = (page - 1) * limit;
 
     const bookshelves = await Bookshelf.find(query).limit(limit).skip(skip);

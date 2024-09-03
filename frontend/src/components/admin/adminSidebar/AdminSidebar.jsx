@@ -9,12 +9,17 @@ import { MdInsertComment } from "react-icons/md";
 import { MdCategory } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
 import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
+import Logout from "../../../utils/globalFunctions/Logout";
 
 const AdminSidebar = ({ isActive, setIsActive }) => {
   // Global state variables
   const { loading } = useSelector((state) => state.user);
+  const { signOut } = Logout();
 
-  const handleLogout = () => {};
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut(); 
+  };
 
   return (
     <section className="user-profile-sidebar-wrapper">

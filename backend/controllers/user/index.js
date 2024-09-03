@@ -59,21 +59,24 @@ export const getMembersBySearch = async (req, res, next) => {
   }
 };
 
+//====================================================================
+// Get single user
+//====================================================================
 export const getSingleUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return next(createError(404, "User not found"));
     }
-    res.status(200).json(user);
+    res.status(200).json({
+      success: true,
+      result: user,
+    });
   } catch (err) {
     next(createError(500, "Server error"));
   }
 };
 
-//====================================================================
-// Get single user
-//====================================================================
 export const getUser = async (req, res, next) => {
   const userId = req.params.id;
 

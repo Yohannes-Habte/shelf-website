@@ -8,18 +8,25 @@ import { Link, useNavigate } from "react-router-dom";
 import { RiAdminFill } from "react-icons/ri";
 import ButtonLoader from "../../../utils/loader/buttonLoader/ButtonLoader";
 import { useEffect } from "react";
+import Logout from "../../../utils/globalFunctions/Logout";
 
 const UserSidebar = ({ isActive, setIsActive }) => {
   const navigate = useNavigate();
   // Global state variables
   const { currentUser, loading } = useSelector((state) => state.user);
+  const { signOut } = Logout();
 
   useEffect(() => {
     if (!loading && !currentUser) {
       navigate("/");
     }
   }, [currentUser]);
-  const handleLogout = () => {};
+ 
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut(); 
+  };
 
   return (
     <section className="user-profile-sidebar-wrapper">

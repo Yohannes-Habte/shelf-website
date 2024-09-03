@@ -3,7 +3,6 @@ import {
   deleteUser,
   getSingleUser,
   getTotalUsersCount,
-  getUser,
   getUserBorrowedBooks,
   getUserDonatedBooks,
   getUsers,
@@ -17,7 +16,6 @@ const userRouter = express.Router();
 // User Routes
 userRouter.get("/", getUsers);
 userRouter.get("/user", isAuthenticated, getSingleUser);
-userRouter.get("/:id", getUser);
 userRouter.put("/id", updateUserAddress);
 userRouter.delete("/:id", deleteUser);
 userRouter.get("/count/total", getTotalUsersCount);
